@@ -8,6 +8,14 @@ const linkSchema = new mongoose.Schema({
         minLength: 3,
         maxLength: 100,
     },
+    originalAddress: {
+        type: String,
+        required: [true, 'Original address is required!'],
+        unique: true,
+        trim: true,
+        minLength: 4,
+        maxLength: 30,
+    },
     customAddress: {
         type: String,
         required: [true, 'Custom address is required!'],
@@ -33,7 +41,13 @@ const linkSchema = new mongoose.Schema({
     },
     renewalDate: {
         type: Date,
-        required: [true, 'Start date is required!'],
+        required: true,
+        default: function () {
+            const renewalPeriod = 31;
+            const date = new Date(this.startDate || new Date());
+            date.setDate(date.getDate() + renewalPeriod);
+            return date;
+        },
         validate: {
             validator: function (v) {
                 return v > this.startDate;
@@ -50,11 +64,6 @@ const linkSchema = new mongoose.Schema({
 }, {timestamps: true});
 
 linkSchema.pre('save', function (next) {
-    if (!this.renewalDate) {
-        const renewalPeriod = 31;
-        this.renewalDate.setDate(this.renewalDate.getDate() + renewalPeriod);
-    }
-
     if (this.renewalDate < new Date()) {
         this.status = 'inactive';
     }
