@@ -12,15 +12,15 @@ export const createLink = async (req, res, next) => {
 
 export const getUserLinks = async (req, res, next) => {
     try {
+        const links = await Link.find({ user: req.user._id });
 
-        if (req.user.id !== req.params.id) {
-            const error = new Error('Unauthorized.');
-            error.status = 401;
+        if (!links) {
+            const error = new Error('No links found for this user');
+            error.status = 404;
             throw error;
         }
-        const links = await Link.find({user: req.params.id});
 
-        res.status(200).json({success: true, data: links});
+        res.status(200).json({ success: true, data: links });
     } catch (error) {
         next(error);
     }

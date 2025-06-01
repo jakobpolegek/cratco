@@ -5,7 +5,7 @@ import {createLink, getUserLinks} from "../controllers/link.controller.js";
 
 const linkRouter = Router();
 
-linkRouter.get('/user/:id', authorize, errorMiddleware, getUserLinks);
+linkRouter.get('/', authorize, errorMiddleware, getUserLinks);
 
 linkRouter.post('/', authorize, errorMiddleware, createLink);
 
