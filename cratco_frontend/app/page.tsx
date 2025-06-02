@@ -17,9 +17,7 @@ export default function HomePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-xl">Loading...</div>
-            </div>
+            <span className="flex justify-center mt-8 loading loading-infinity loading-xl"></span>
         );
     }
 

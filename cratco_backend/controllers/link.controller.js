@@ -25,3 +25,22 @@ export const getUserLinks = async (req, res, next) => {
         next(error);
     }
 }
+
+export const getUserLink = async (req, res, next) => {
+    try {
+        const link = await Link.findOne({_id: req.params.id, user: req.user._id});
+
+        if (!link) {
+            const error = new Error('Link not found');
+            error.status = 404;
+            throw error;
+        }
+
+        res.status(200).json({success: true, data: link});
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+

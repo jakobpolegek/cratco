@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cratco",
+  title: "Cratco - Custom links and URL shortener.",
   description: "Cratco - Custom links and URL shortener.",
 };
 
@@ -25,12 +25,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="bg-background">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <AuthProvider>
               <NavigationBar/>
-              <div id="content" >
+              <div id="content" className="mx-5 mt-5" >
                   {children}
               </div>
           </AuthProvider>

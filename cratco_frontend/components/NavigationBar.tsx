@@ -6,7 +6,7 @@ import {useAuth} from "@/contexts/AuthContext";
 export const NavigationBar = () => {
     const { user } = useAuth();
     return (
-    <div id="navigation-bar" className="flex gap-6 mt-10 items-center justify-center">
+    <div id="navigation-bar" className="flex gap-6 mt-5  items-center justify-center">
         {user &&
         <>
             <Link href="/">Home</Link>
