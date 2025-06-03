@@ -14,7 +14,7 @@ const linkSchema = new mongoose.Schema({
         unique: true,
         trim: true,
         minLength: 4,
-        maxLength: 30,
+        maxLength: 100,
     },
     customAddress: {
         type: String,
