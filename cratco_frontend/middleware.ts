@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
     const isPublicPath = publicPaths.some(path => pathname.startsWith(path));
 
     if (isPublicPath) {
-        if (token && (pathname === '/login' || pathname === '/register')) {
+        if (token) {
             return NextResponse.redirect(new URL('/', request.url));
         }
         return NextResponse.next();
@@ -24,6 +24,13 @@ export function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/((?!api(?!/auth)|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
+        /*
+         * Match all request paths except for the ones starting with:
+         * - api (API routes)
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         */
+        '/((?!api|_next/static|_next/image|favicon.ico).*)',
     ],
 };

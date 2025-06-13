@@ -11,18 +11,18 @@ const linkSchema = new mongoose.Schema({
     originalAddress: {
         type: String,
         required: [true, 'Original address is required!'],
-        unique: true,
+        unique: false,
         trim: true,
         minLength: 4,
-        maxLength: 100,
+        maxLength: 130,
     },
     customAddress: {
         type: String,
         required: [true, 'Custom address is required!'],
         unique: true,
         trim: true,
-        minLength: 4,
-        maxLength: 30,
+        minLength: 3,
+        maxLength: 50,
     },
     status: {
         type: String,

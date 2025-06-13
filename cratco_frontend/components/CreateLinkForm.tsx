@@ -60,19 +60,18 @@ const CreateLinkForm = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ onC
                 body
             });
 
-            if (res.status === 200) {
-                setAlert({ type: 'success', message: 'Link successfully created!' });
+            if (res.createdAt) {
+                setAlert({ type: 'success', message: 'Link successfully created! This window will close in 4 seconds.' });
                 setTimeout(() => {
                     clearForm();
+                    setIsSubmitting(false);
                     onClose();
-                }, 2000);
+                }, 4000);
             } else {
                 setAlert({ type: 'error', message: 'Failed to create link. Please try again.' });
             }
         } catch (error) {
             setAlert({ type: 'error', message: 'An error occurred. Please try again.' });
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -119,7 +118,7 @@ const CreateLinkForm = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ onC
 
                 <div className="modal-action">
                     <button
-                        className="btn btn-ghost mr-4"
+                        className="btn btn-secondary mr-4"
                         onClick={handleClose}
                         disabled={isSubmitting}
                     >
