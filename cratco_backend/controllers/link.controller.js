@@ -15,7 +15,7 @@ export const getUserLinks = async (req, res, next) => {
         const links = await Link.find({ user: req.user._id });
 
         if (!links) {
-            const error = new Error('No links found for this user');
+            const error = new Error('No links found for this user.');
             error.status = 404;
             throw error;
         }
@@ -31,7 +31,7 @@ export const getUserLink = async (req, res, next) => {
         const link = await Link.findOne({_id: req.params.id, user: req.user._id});
 
         if (!link) {
-            const error = new Error('Link not found');
+            const error = new Error('Link not found.');
             error.status = 404;
             throw error;
         }
@@ -42,5 +42,21 @@ export const getUserLink = async (req, res, next) => {
     }
 }
 
+
+export const getPublicLink = async (req, res, next) => {
+    try {
+        const link = await Link.findOne({customAddress: req.params.customAddress});
+
+        if (!link) {
+            const error = new Error('Link not found.');
+            error.status = 404;
+            throw error;
+        }
+
+        res.status(200).json({success: true, data: {originalAddress:link.originalAddress, customAddress: link.customAddress}});
+    } catch (error) {
+        next(error);
+    }
+}
 
 

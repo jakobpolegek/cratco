@@ -18,7 +18,7 @@ export class AuthService {
         });
     }
 
-    private static removeStoredToken(): void {
+    static removeStoredToken(): void {
         if (typeof window === 'undefined') return;
         Cookies.remove('token');
     }

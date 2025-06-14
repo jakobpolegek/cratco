@@ -1,5 +1,5 @@
 "use client";
-import {useAuth} from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from 'next/navigation';
 
 export default function UserInfo() {
@@ -8,7 +8,7 @@ export default function UserInfo() {
 
     const handleLogout = async () => {
         await logout();
-        router.push('/'); // Redirect after successful auth
+        router.push('/login');
     }
     return (
         <div>

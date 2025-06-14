@@ -70,10 +70,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const logout = () => {
-        AuthService.signOut();
-        setToken(null);
-        setUser(null);
+    const logout = async () => {
+        try {
+            await AuthService.signOut();
+        } catch (error) {
+            console.error("Logout API call failed, proceeding with local logout.", error);
+            AuthService.removeStoredToken();
+            Cookies.remove('user');
+        } finally {
+            setToken(null);
+            setUser(null);
+        }
     };
 
     return (
