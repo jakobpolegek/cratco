@@ -22,7 +22,7 @@ const linkSchema = new mongoose.Schema({
         unique: true,
         trim: true,
         minLength: 3,
-        maxLength: 50,
+        maxLength: 7,
     },
     status: {
         type: String,

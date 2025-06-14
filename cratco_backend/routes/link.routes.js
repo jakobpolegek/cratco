@@ -1,9 +1,11 @@
 import {Router} from 'express';
-import authorize from "../middlewares/auth.middleware.js";
+import {authorize, authorizePublicUrl} from "../middlewares/auth.middleware.js";
 import errorMiddleware from "../middlewares/error.middleware.js";
-import {createLink, getUserLinks, getUserLink} from "../controllers/link.controller.js";
+import {createLink, getUserLinks, getUserLink, getPublicLink} from "../controllers/link.controller.js";
 
 const linkRouter = Router();
+
+linkRouter.get('/public-links/:customAddress', authorizePublicUrl, errorMiddleware, getPublicLink);
 
 linkRouter.get('/', authorize, errorMiddleware, getUserLinks);
 

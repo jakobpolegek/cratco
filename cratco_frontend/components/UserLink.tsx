@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useApi } from "@/hooks/useApi";
 import {iLink} from "@/types/iLink";
+import {ArrowRight, Copy} from "@deemlol/next-icons";
 
 
 export function UserLink({linkId}: { linkId: string }) {
@@ -32,6 +33,12 @@ export function UserLink({linkId}: { linkId: string }) {
             ) : (<>
                 {link && (<div>
                     <p className="mt-2"><span className="text-xl font-bold">Name: </span>{link?.name}</p>
+                    <p className="mt-2 flex items-center gap-2">
+                        <span className="text-xl font-bold">Custom address: </span>
+                        /{link?.customAddress}
+                        <button className="btn btn-sm"><Copy size={20} color="#FFFFFF" onClick={() => navigator.clipboard.writeText(link?.customAddress)}/></button>
+                        <a href={`/${link?.customAddress}`} target="_blank" className="btn btn-sm"><ArrowRight size={20} color="#FFFFFF" /></a>
+                    </p>
                     <p className="mt-2"><span
                         className="text-xl font-bold">Status: </span>{link?.status?.charAt(0).toUpperCase() + link?.status?.slice(1)}
                     </p>

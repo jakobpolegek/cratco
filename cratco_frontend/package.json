@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@deemlol/next-icons": "^0.1.9",
     "@types/js-cookie": "^3.0.6",
     "js-cookie": "^3.0.5",
     "next": "15.3.3",
