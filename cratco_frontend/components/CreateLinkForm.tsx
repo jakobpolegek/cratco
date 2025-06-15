@@ -39,8 +39,8 @@ const CreateLinkForm = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ onC
     };
 
     const createLink = async () => {
-        if (!formData.name.trim() || !formData.originalAddress.trim()) {
-            setAlert({ type: 'error', message: 'Name and original link are required!' });
+        if (!formData.originalAddress.trim()) {
+            setAlert({ type: 'error', message: 'Original link is required!' });
             return;
         }
 
@@ -61,12 +61,12 @@ const CreateLinkForm = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ onC
             });
 
             if (res.createdAt) {
-                setAlert({ type: 'success', message: 'Link successfully created! This window will close in 4 seconds.' });
+                setAlert({ type: 'success', message: 'Link successfully created! This window will close in 3 seconds.' });
                 setTimeout(() => {
                     clearForm();
                     setIsSubmitting(false);
                     onClose();
-                }, 4000);
+                }, 3000);
             } else {
                 setAlert({ type: 'error', message: 'Failed to create link. Please try again.' });
             }
@@ -89,18 +89,18 @@ const CreateLinkForm = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ onC
                 <div className="flex flex-col gap-4 items-center w-full">
                     <input
                         type="text"
-                        placeholder="Name of your link"
-                        className="input input-primary w-full"
-                        value={formData.name}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
-                        disabled={isSubmitting}
-                    />
-                    <input
-                        type="text"
                         placeholder="Original link"
                         className="input input-primary w-full"
                         value={formData.originalAddress}
                         onChange={(e) => handleInputChange('originalAddress', e.target.value)}
+                        disabled={isSubmitting}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Name of your link"
+                        className="input input-primary w-full"
+                        value={formData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
                         disabled={isSubmitting}
                     />
                     <input

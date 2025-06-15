@@ -1,14 +1,23 @@
 import Link from '../models/link.model.js';
+import {generateUniqueField} from "../utils/generateUniqueField.js";
 
 export const createLink = async (req, res, next) => {
     try {
-        const link = await Link.create({...req.body, user: req.user._id});
+        const linkData = { ...req.body, user: req.user._id };
+        const uniqueAddress = await generateUniqueField('customAddress', 7);
+        if (!linkData.name || !linkData.name.trim()) {
+            linkData.name = uniqueAddress;
+        }
+        if (!linkData.customAddress || !linkData.customAddress.trim()) {
+            linkData.customAddress = uniqueAddress;
+        }
+        const link = await Link.create(linkData);
 
-        res.status(201).json({success: true, data: link});
+        res.status(201).json({ success: true, data: link });
     } catch (error) {
         next(error);
     }
-}
+};
 
 export const getUserLinks = async (req, res, next) => {
     try {

@@ -36,7 +36,7 @@ export default function HomePage() {
         <div className="min-h-screen bg-blend-darken flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <h1 className="text-3xl font-bold text-center text-gray-50">
-                    Welcome to crat.co!
+                    Welcome to crat.co
                 </h1>
 
                 <div className="bg-blend-darken py-8 px-4 shadow sm:rounded-lg sm:px-10">
