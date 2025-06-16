@@ -19,10 +19,14 @@ const linkSchema = new mongoose.Schema({
     customAddress: {
         type: String,
         required: [true, 'Custom address is required!'],
-        unique: true,
+        unique: [true, 'Custom address is already taken! Try another one or leave it blank to get a random one.'],
         trim: true,
         minLength: 3,
         maxLength: 7,
+    },
+    visits:{
+        type: Number,
+        default: 0,
     },
     status: {
         type: String,

@@ -15,7 +15,8 @@ export function UserLink({linkId}: { linkId: string }) {
     useEffect(() => {
         const fetchLink = async () => {
             try {
-                const data = await apiCall(`/links/${linkId}`);
+                const res = await apiCall(`/links/${linkId}`);
+                const { data } = await res.json();
                 setLink(data);
             } catch (error) {
                 console.error('Failed to fetch links:', error);

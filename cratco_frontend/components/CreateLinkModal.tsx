@@ -7,7 +7,7 @@ interface CreateLinkFormProps {
     onClose: () => void;
 }
 
-const CreateLinkForm = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ onClose }, ref) => {
+const CreateLinkModal = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ onClose }, ref) => {
     const [formData, setFormData] = useState({
         name: '',
         originalAddress: '',
@@ -39,15 +39,20 @@ const CreateLinkForm = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ onC
     };
 
     const createLink = async () => {
-        if (!formData.originalAddress.trim()) {
-            setAlert({ type: 'error', message: 'Original link is required!' });
-            return;
-        }
-
-        setIsSubmitting(true);
-        setAlert(null);
-
         try {
+            if (!formData.originalAddress.trim()) {
+                setAlert({ type: 'error', message: 'Original link is required!' });
+                return;
+            }
+
+            if (!URL.canParse(formData.originalAddress)) {
+                setAlert({ type: 'error', message: 'Please enter a valid URL.' });
+                return;
+            }
+
+            setIsSubmitting(true);
+            setAlert(null);
+
             const body = JSON.stringify({
                 name: formData.name,
                 originalAddress: formData.originalAddress,
@@ -145,6 +150,6 @@ const CreateLinkForm = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ onC
     );
 });
 
-CreateLinkForm.displayName = 'CreateLinkForm';
+CreateLinkModal.displayName = 'CreateLinkModal';
 
-export default CreateLinkForm;
+export default CreateLinkModal;

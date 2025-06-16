@@ -1,7 +1,14 @@
 import {Router} from 'express';
 import {authorize, authorizePublicUrl} from "../middlewares/auth.middleware.js";
 import errorMiddleware from "../middlewares/error.middleware.js";
-import {createLink, getUserLinks, getUserLink, getPublicLink} from "../controllers/link.controller.js";
+import {
+    createLink,
+    getUserLinks,
+    getUserLink,
+    getPublicLink,
+    updateLink,
+    deleteLink
+} from "../controllers/link.controller.js";
 
 const linkRouter = Router();
 
@@ -13,12 +20,8 @@ linkRouter.post('/', authorize, errorMiddleware, createLink);
 
 linkRouter.get('/:id', authorize, errorMiddleware, getUserLink);
 
-linkRouter.put('/:id', (req, res) => {
-    res.send({title: 'UPDATE link!'});
-})
+linkRouter.put('/:id', authorize, errorMiddleware, updateLink)
 
-linkRouter.delete('/:id', (req, res) => {
-    res.send({title: 'DELETE link!'});
-})
+linkRouter.delete('/:id',  authorize, errorMiddleware, deleteLink)
 
 export default linkRouter;

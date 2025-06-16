@@ -46,17 +46,14 @@ export async function middleware(request: NextRequest) {
     const isPublicPath = ['/login', '/register'].some(path => pathname.startsWith(path));
 
     if (isPublicPath) {
-        if (token) {
-            return NextResponse.redirect(new URL('/', request.url));
-        }
-        return NextResponse.next();
+        return token
+            ? NextResponse.redirect(new URL('/', request.url))
+            : NextResponse.next();
     }
+    return token
+        ? NextResponse.next()
+        : NextResponse.redirect(new URL('/login', request.url));
 
-    if (!token) {
-        return NextResponse.redirect(new URL('/login', request.url));
-    }
-
-    return NextResponse.next();
 }
 
 export const config = {

@@ -3,7 +3,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import CreateLinkForm from '@/components/CreateLinkForm';
+import CreateLinkModal from '@/components/CreateLinkModal';
 
 export default function HomePage() {
     const { user, loading } = useAuth();
@@ -47,7 +47,7 @@ export default function HomePage() {
                         Create new link here
                     </button>
 
-                    <CreateLinkForm
+                    <CreateLinkModal
                         ref={modalRef}
                         onClose={closeModal}
                     />

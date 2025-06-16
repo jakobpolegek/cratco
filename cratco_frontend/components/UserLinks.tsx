@@ -1,29 +1,44 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Link from "next/link";
 import { useApi } from "@/hooks/useApi";
 import {iLink} from "@/types/iLink";
-import {ArrowRight, Copy} from "@deemlol/next-icons";
+import {ArrowRight, Copy, Trash} from "@deemlol/next-icons";
+import DeleteLinkModal from "@/components/DeleteLinkModal";
 
 export function UserLinks() {
     const {apiCall} = useApi();
     const [links, setLinks] = useState<iLink[]>([]);
     const [loading, setLoading] = useState(true);
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    const [linkToDelete, setLinkToDelete] = useState<{ id: string; name: string } | null>(null);
+    const modalRef = useRef<HTMLDialogElement>(null);
+
+    const openModal = (linkId: string, linkName: string) => {
+        setLinkToDelete({ id: linkId, name: linkName });
+        modalRef.current?.showModal();
+    };
+
+    const closeModal = () => {
+        modalRef.current?.close();
+        setLinkToDelete(null);
+        fetchLinks();
+    };
+
+    const fetchLinks = async () => {
+        try {
+            const res = await apiCall('/links');
+            const { data } = await res.json();
+            setLinks(data);
+        } catch (error) {
+            console.error('Failed to fetch links:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchLinks = async () => {
-            try {
-                const data = await apiCall('/links');
-                setLinks(data);
-            } catch (error) {
-                console.error('Failed to fetch links:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchLinks();
     }, []);
 
@@ -55,6 +70,11 @@ export function UserLinks() {
                                             </div>
                                         </Link>
                                         <div className="text-xl opacity-60">
+                                            <button className="btn btn-sm btn-secondary"
+                                                    onClick={() => openModal(link._id, link.name)}
+                                            >
+                                                <Trash size={20} color="#FFFFFF"/>
+                                            </button>
                                             <button className="btn btn-sm"
                                                     onClick={() => {
                                                         setAlert({ type: 'success', message: 'Link copied to clipboard!' });
@@ -74,6 +94,15 @@ export function UserLinks() {
                                 </li>
                             ))}
                         </ul>}
+
+                    {linkToDelete && (
+                        <DeleteLinkModal
+                            ref={modalRef}
+                            onClose={closeModal}
+                            linkId={linkToDelete.id}
+                            linkName={linkToDelete.name}
+                        />
+                    )}
                 </div>
             )}
         </div>

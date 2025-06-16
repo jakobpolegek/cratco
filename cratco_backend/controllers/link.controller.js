@@ -3,7 +3,26 @@ import {generateUniqueField} from "../utils/generateUniqueField.js";
 
 export const createLink = async (req, res, next) => {
     try {
+        let validatedUrl;
+        try {
+            validatedUrl = new URL(req.body.originalAddress.trim());
+        } catch {
+            return res.status(400).json({
+                success: false,
+                error: 'Please provide a valid URL.'
+            });
+        }
+
+        if (!['http:', 'https:'].includes(validatedUrl.protocol)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Only HTTP and HTTPS URLs are allowed.'
+            });
+        }
+
         const linkData = { ...req.body, user: req.user._id };
+        linkData.originalAddress = validatedUrl.href;
+
         const uniqueAddress = await generateUniqueField('customAddress', 7);
         if (!linkData.name || !linkData.name.trim()) {
             linkData.name = uniqueAddress;
@@ -11,6 +30,7 @@ export const createLink = async (req, res, next) => {
         if (!linkData.customAddress || !linkData.customAddress.trim()) {
             linkData.customAddress = uniqueAddress;
         }
+
         const link = await Link.create(linkData);
 
         res.status(201).json({ success: true, data: link });
@@ -18,6 +38,25 @@ export const createLink = async (req, res, next) => {
         next(error);
     }
 };
+
+export const updateLink = async (req, res, next) => {
+    try {
+        const link = await Link.findOneAndUpdate({ _id: req.params.id, user: req.user._id }, req.body, { new: true });
+        res.status(200).json({ success: true, data: link });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const deleteLink = async (req, res, next) => {
+    try {
+        const link = await Link.findOneAndDelete({_id: req.params.id, user: req.user._id});
+        res.status(200).json({success: true, data: link});
+    }
+    catch (error) {
+        next(error);
+    }
+}
 
 export const getUserLinks = async (req, res, next) => {
     try {

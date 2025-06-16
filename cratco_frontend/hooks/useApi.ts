@@ -33,8 +33,7 @@ export function useApi() {
             throw new Error(error.message || 'API call failed');
         }
 
-        const jsonResponse = await response.json();
-        return jsonResponse.data;
+        return response;
     };
 
     return { apiCall };
