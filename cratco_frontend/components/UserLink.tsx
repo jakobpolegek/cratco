@@ -1,16 +1,31 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useApi } from "@/hooks/useApi";
 import {iLink} from "@/types/iLink";
-import {ArrowRight, Copy} from "@deemlol/next-icons";
-
+import {ArrowRight, Copy, Trash, Edit} from "@deemlol/next-icons";
+import DeleteLinkModal from "@/components/DeleteLinkModal";
+import CreateEditLinkModal from "@/components/CreateEditLinkModal";
 
 export function UserLink({linkId}: { linkId: string }) {
     const {apiCall} = useApi();
     const [link, setLink] = useState<iLink>();
     const [loading, setLoading] = useState(true);
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    const [linkToDelete, setLinkToDelete] = useState<{ id: string; name: string } | null>(null);
+    const modalRef = useRef<HTMLDialogElement>(null);
+
+    const openModal = (linkId: string, linkName: string) => {
+        setLinkToDelete({ id: linkId, name: linkName });
+        modalRef.current?.showModal();
+    };
+
+    const closeModal = () => {
+        setLinkToDelete(null);
+        setAlert(null);
+        modalRef.current?.close();
+
+    };
 
     useEffect(() => {
         const fetchLink = async () => {
@@ -63,9 +78,38 @@ export function UserLink({linkId}: { linkId: string }) {
                         className="text-xl font-bold">Status: </span>{link?.status?.charAt(0).toUpperCase() + link?.status?.slice(1)}
                     </p>
                     <p className="mt-2"><span className="text-xl font-bold">Original address: </span>{link?.originalAddress}</p>
-                    <p className="mt-2"><span className="text-xl font-bold">Active till: </span>{new Date(link?.renewalDate).toLocaleDateString()}</p>
-                </div>)}</>
-            )}
+                    <p className="mt-2"><span className="text-xl font-bold">Visits: </span>{link?.visits}</p>
+                    <p className="mt-2 flex items-center gap-2">
+                        <span className="text-xl font-bold">Active till: </span>
+                        {new Date(link?.renewalDate).toLocaleDateString()}
+                    </p>
+                    <p id="buttons" className="mt-2 flex items-center gap-2">
+                        <button className="btn btn-sm btn-secondary"
+                                onClick={() => openModal(link._id, link.name)}
+                        >
+                            <Trash size={20} color="#FFFFFF"/> Delete
+                        </button>
+                        <button className="btn btn-sm"
+                                onClick={() => openModal(link._id, link.name)}
+                        >
+                            <Edit size={20} color="#FFFFFF"/> Edit
+                        </button>
+                    </p>
+                </div>)}
+
+                <DeleteLinkModal
+                    ref={modalRef}
+                    onClose={closeModal}
+                    linkId={linkToDelete?.id || ''}
+                    linkName={linkToDelete?.name || ''}
+                />
+                <CreateEditLinkModal
+                    ref={modalRef}
+                    onClose={closeModal}
+                    mode="edit"
+                    editLink={link}
+                />
+            </>)}
         </div>
     );
 }

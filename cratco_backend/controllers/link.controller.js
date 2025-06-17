@@ -41,12 +41,52 @@ export const createLink = async (req, res, next) => {
 
 export const updateLink = async (req, res, next) => {
     try {
-        const link = await Link.findOneAndUpdate({ _id: req.params.id, user: req.user._id }, req.body, { new: true });
-        res.status(200).json({ success: true, data: link });
+        const { id } = req.params;
+        const isVisitUpdate = req.body.visits !== undefined && Object.keys(req.body).length === 1;
+
+        let query;
+        if (isVisitUpdate) {
+            query = { _id: id };
+        } else {
+            if (!req.user || !req.user._id) {
+                return res.status(401).json({ success: false, message: 'Authentication required' });
+            }
+            query = { _id: id, user: req.user._id };
+        }
+
+        const existingLink = await Link.findOne(query);
+        if (!existingLink) {
+            return res.status(404).json({ success: false, message: 'Link not found' });
+        }
+
+        let updateData;
+        if (isVisitUpdate) {
+            const updatedLink = await Link.findOneAndUpdate(
+                query,
+                { $inc: { visits: 1 } },
+                { new: true }
+            );
+            return res.status(200).json({ success: true, data: updatedLink });
+        } else {
+            updateData = { ...req.body };
+
+            delete updateData._id;
+            delete updateData.user;
+            delete updateData.createdAt;
+
+            const updatedLink = await Link.findOneAndUpdate(
+                query,
+                updateData,
+                { new: true, runValidators: true }
+            );
+
+            return res.status(200).json({ success: true, data: updatedLink });
+        }
+
     } catch (error) {
         next(error);
     }
-}
+};
 
 export const deleteLink = async (req, res, next) => {
     try {
@@ -101,7 +141,7 @@ export const getPublicLink = async (req, res, next) => {
             throw error;
         }
 
-        res.status(200).json({success: true, data: {originalAddress:link.originalAddress, customAddress: link.customAddress}});
+        res.status(200).json({success: true, data: {_id:link._id, originalAddress:link.originalAddress, customAddress: link.customAddress, visits: link.visits}});
     } catch (error) {
         next(error);
     }

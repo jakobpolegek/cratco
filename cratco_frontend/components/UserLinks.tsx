@@ -22,6 +22,7 @@ export function UserLinks() {
 
     const closeModal = () => {
         modalRef.current?.close();
+        setAlert(null);
         setLinkToDelete(null);
         fetchLinks();
     };
@@ -95,14 +96,12 @@ export function UserLinks() {
                             ))}
                         </ul>}
 
-                    {linkToDelete && (
-                        <DeleteLinkModal
-                            ref={modalRef}
-                            onClose={closeModal}
-                            linkId={linkToDelete.id}
-                            linkName={linkToDelete.name}
-                        />
-                    )}
+                    <DeleteLinkModal
+                        ref={modalRef}
+                        onClose={closeModal}
+                        linkId={linkToDelete?.id || ''}
+                        linkName={linkToDelete?.name || ''}
+                    />
                 </div>
             )}
         </div>

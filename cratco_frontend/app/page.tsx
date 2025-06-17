@@ -3,7 +3,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import CreateLinkModal from '@/components/CreateLinkModal';
+import CreateEditLinkModal from '@/components/CreateEditLinkModal';
 
 export default function HomePage() {
     const { user, loading } = useAuth();
@@ -47,9 +47,10 @@ export default function HomePage() {
                         Create new link here
                     </button>
 
-                    <CreateLinkModal
+                    <CreateEditLinkModal
                         ref={modalRef}
                         onClose={closeModal}
+                        mode="create"
                     />
                 </div>
             </div>

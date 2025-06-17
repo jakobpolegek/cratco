@@ -9,4 +9,5 @@ export interface iLink {
     user: string;
     createdAt?: Date;
     updatedAt?: Date;
+    visits?: number;
 }

@@ -1,13 +1,16 @@
 'use client';
 
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef, useEffect } from 'react';
 import { useApi } from "@/hooks/useApi";
+import { iLink } from "@/types/iLink";
 
-interface CreateLinkFormProps {
+interface CreateEditLinkModalProps {
     onClose: () => void;
+    editLink?: iLink | null;
+    mode?: 'create' | 'edit';
 }
 
-const CreateLinkModal = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ onClose }, ref) => {
+const CreateEditLinkModal = forwardRef<HTMLDialogElement, CreateEditLinkModalProps>(({ onClose, editLink = null, mode = 'create' }, ref) => {
     const [formData, setFormData] = useState({
         name: '',
         originalAddress: '',
@@ -16,6 +19,23 @@ const CreateLinkModal = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ on
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { apiCall } = useApi();
+
+    useEffect(() => {
+        if (mode === 'edit' && editLink) {
+            setFormData({
+                name: editLink.name || '',
+                originalAddress: editLink.originalAddress || '',
+                customAddress: editLink.customAddress || ''
+            });
+        } else {
+            setFormData({
+                name: '',
+                originalAddress: '',
+                customAddress: ''
+            });
+        }
+        setAlert(null);
+    }, [mode, editLink]);
 
     const clearForm = () => {
         setFormData({
@@ -38,7 +58,7 @@ const CreateLinkModal = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ on
         }));
     };
 
-    const createLink = async () => {
+    const submitForm = async () => {
         try {
             if (!formData.originalAddress.trim()) {
                 setAlert({ type: 'error', message: 'Original link is required!' });
@@ -57,33 +77,50 @@ const CreateLinkModal = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ on
                 name: formData.name,
                 originalAddress: formData.originalAddress,
                 customAddress: formData.customAddress,
-                startDate: new Date()
+                ...(mode === 'create' && { startDate: new Date() })
             });
 
-            const res = await apiCall('/links', {
-                method: 'POST',
-                body
-            });
+            let res;
+            if (mode === 'edit' && editLink) {
+                res = await apiCall(`/links/${editLink._id}`, {
+                    method: 'PUT',
+                    body
+                });
+            } else {
+                res = await apiCall('/links', {
+                    method: 'POST',
+                    body
+                });
+            }
+            const successMessage = mode === 'edit' ? 'Link successfully updated!' : 'Link successfully created!';
 
-            if (res.createdAt) {
-                setAlert({ type: 'success', message: 'Link successfully created! This window will close in 3 seconds.' });
+            if ((mode === 'create' && res.status===201) || (mode === 'edit' && res)) {
+                setAlert({ type: 'success', message: `${successMessage} This window will close in 3 seconds.` });
                 setTimeout(() => {
                     clearForm();
                     setIsSubmitting(false);
                     onClose();
                 }, 3000);
             } else {
-                setAlert({ type: 'error', message: 'Failed to create link. Please try again.' });
+                const errorMessage = mode === 'edit' ? 'Failed to update link.' : 'Failed to create link.';
+                setAlert({ type: 'error', message: `${errorMessage} Please try again.` });
+                setIsSubmitting(false);
             }
         } catch (error) {
-            setAlert({ type: 'error', message: 'An error occurred. Please try again.' });
+            const errorMessage = mode === 'edit' ? 'Failed to update link.' : 'An error occurred while creating the link.';
+            setAlert({ type: 'error', message: `${errorMessage} Please try again.` });
+            setIsSubmitting(false);
         }
     };
+
+    const modalTitle = mode === 'edit' ? 'Edit Link' : 'Create New Link';
+    const submitButtonText = mode === 'edit' ? 'Update' : 'Create';
+    const loadingText = mode === 'edit' ? 'Updating...' : 'Creating...';
 
     return (
         <dialog ref={ref} className="modal">
             <div className="modal-box w-11/12 max-w-xl flex flex-col justify-center items-center">
-                <h3 className="font-bold text-lg mb-4">Create New Link</h3>
+                <h3 className="font-bold text-lg mb-4">{modalTitle}</h3>
 
                 {alert && (
                     <div className={`alert ${alert.type === 'success' ? 'alert-success' : 'alert-error'} mb-4 w-full`}>
@@ -92,6 +129,16 @@ const CreateLinkModal = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ on
                 )}
 
                 <div className="flex flex-col gap-4 items-center w-full">
+                    {mode==='edit' && <label htmlFor="name" className="text-sm font-medium text-gray-500">Link name:</label>}
+                    <input
+                    type="text"
+                    placeholder="Name of your link"
+                    className="input input-primary w-full"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    disabled={isSubmitting}
+                    />
+                    {mode==='edit' && <label htmlFor="originalAddress" className="text-sm font-medium text-gray-500">Original address:</label>}
                     <input
                         type="text"
                         placeholder="Original link"
@@ -100,14 +147,7 @@ const CreateLinkModal = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ on
                         onChange={(e) => handleInputChange('originalAddress', e.target.value)}
                         disabled={isSubmitting}
                     />
-                    <input
-                        type="text"
-                        placeholder="Name of your link"
-                        className="input input-primary w-full"
-                        value={formData.name}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
-                        disabled={isSubmitting}
-                    />
+                    {mode==='edit' && <label htmlFor="originalAddress" className="text-sm font-medium text-gray-500">Custom address:</label>}
                     <input
                         type="text"
                         placeholder="Custom address"
@@ -116,9 +156,9 @@ const CreateLinkModal = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ on
                         onChange={(e) => handleInputChange('customAddress', e.target.value)}
                         disabled={isSubmitting}
                     />
-                    <p className="py-4 text-center text-sm opacity-70">
+                    {mode==='create' && <p className="py-4 text-center text-sm opacity-70">
                         Your links can be viewed by clicking on your name in the navigation bar.
-                    </p>
+                    </p>}
                 </div>
 
                 <div className="modal-action">
@@ -132,16 +172,16 @@ const CreateLinkModal = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ on
                     <button
                         type="button"
                         className="btn btn-primary"
-                        onClick={createLink}
+                        onClick={submitForm}
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? (
                             <>
                                 <span className="loading loading-spinner loading-sm"></span>
-                                Creating...
+                                {loadingText}
                             </>
                         ) : (
-                            'Create'
+                            submitButtonText
                         )}
                     </button>
                 </div>
@@ -150,6 +190,6 @@ const CreateLinkModal = forwardRef<HTMLDialogElement, CreateLinkFormProps>(({ on
     );
 });
 
-CreateLinkModal.displayName = 'CreateLinkModal';
+CreateEditLinkModal.displayName = 'CreateEditLinkModal';
 
-export default CreateLinkModal;
+export default CreateEditLinkModal;

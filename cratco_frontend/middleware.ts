@@ -32,6 +32,25 @@ export async function middleware(request: NextRequest) {
             if (response.ok) {
                 const { data } = await response.json();
                 if (data.originalAddress) {
+                    try {
+                        const updateEndpoint = `${process.env.NEXT_PUBLIC_API_SRC}/links/${data._id}`;
+                        const currentVisits = data.visits;
+
+                        await fetch(updateEndpoint, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${process.env.PUBLIC_LINKS_SECRET}`
+                            },
+                            body: JSON.stringify({
+                                visits: currentVisits + 1
+                            })
+                        });
+
+                    } catch (updateError) {
+                        console.error('Error updating visit count:', updateError);
+                    }
+
                     return NextResponse.redirect(data.originalAddress);
                 }
             }
