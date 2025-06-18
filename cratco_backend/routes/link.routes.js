@@ -7,12 +7,15 @@ import {
     getUserLink,
     getPublicLink,
     updateLink,
-    deleteLink
+    deleteLink,
+    updateVisitsCount
 } from "../controllers/link.controller.js";
 
 const linkRouter = Router();
 
 linkRouter.get('/public-links/:customAddress', authorizePublicUrl, errorMiddleware, getPublicLink);
+
+linkRouter.put('/public-links/:customAddress', authorizePublicUrl, errorMiddleware, updateVisitsCount);
 
 linkRouter.get('/', authorize, errorMiddleware, getUserLinks);
 
