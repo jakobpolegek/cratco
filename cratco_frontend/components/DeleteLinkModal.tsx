@@ -38,7 +38,7 @@ const DeleteLinkModal = forwardRef<HTMLDialogElement, DeleteLinkModalProps>(({ o
                 setAlert({ type: 'error', message: 'Failed to delete link. Please try again.' });
                 setIsDeleting(false);
             }
-        } catch (error) {
+        } catch {
             setAlert({ type: 'error', message: 'An error occurred. Please try again.' });
             setIsDeleting(false);
         }
@@ -58,7 +58,7 @@ const DeleteLinkModal = forwardRef<HTMLDialogElement, DeleteLinkModalProps>(({ o
                 <div className="text-center mb-6">
                     <p className="text-base mb-2">Are you sure you want to delete this link?</p>
                     {linkName && (
-                        <p className="text-sm opacity-70 font-medium">"{linkName}"</p>
+                        <p className="text-sm opacity-70 font-medium">&quot;{linkName}&quot;</p>
                     )}
                     <p className="text-xs opacity-50 mt-2">This action cannot be undone.</p>
                 </div>

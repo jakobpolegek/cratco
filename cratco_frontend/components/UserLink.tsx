@@ -31,7 +31,7 @@ export function UserLink({linkId}: { linkId: string }) {
         const fetchLink = async () => {
             try {
                 const res = await apiCall(`/links/${linkId}`);
-                const { data } = await res.json();
+                const {data} = await res.json();
                 setLink(data);
             } catch (error) {
                 console.error('Failed to fetch links:', error);
@@ -41,7 +41,7 @@ export function UserLink({linkId}: { linkId: string }) {
         };
 
         fetchLink();
-    }, []);
+    }, [apiCall, linkId]);
 
     return (
         <div className="flex justify-center mt-8">

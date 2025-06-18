@@ -106,9 +106,9 @@ const CreateEditLinkModal = forwardRef<HTMLDialogElement, CreateEditLinkModalPro
                 setAlert({ type: 'error', message: `${errorMessage} Please try again.` });
                 setIsSubmitting(false);
             }
-        } catch (error) {
+        } catch {
             const errorMessage = mode === 'edit' ? 'Failed to update link.' : 'An error occurred while creating the link.';
-            setAlert({ type: 'error', message: `${errorMessage} Please try again.` });
+            setAlert({type: 'error', message: `${errorMessage} Please try again.`});
             setIsSubmitting(false);
         }
     };

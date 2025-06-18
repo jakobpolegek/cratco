@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, useCallback} from 'react';
 import Link from "next/link";
 import { useApi } from "@/hooks/useApi";
 import {iLink} from "@/types/iLink";
@@ -27,7 +27,7 @@ export function UserLinks() {
         fetchLinks();
     };
 
-    const fetchLinks = async () => {
+    const fetchLinks = useCallback(async () => {
         try {
             const res = await apiCall('/links');
             const { data } = await res.json();
@@ -37,11 +37,11 @@ export function UserLinks() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [apiCall]);
 
     useEffect(() => {
         fetchLinks();
-    }, []);
+    }, [fetchLinks]);
 
     return (
         <div className="flex justify-center mt-8">
