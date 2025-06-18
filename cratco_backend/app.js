@@ -1,5 +1,5 @@
 import express from 'express';
-import {FRONTEND_URL, PORT} from "./config/env.js";
+import {FRONTEND_URL} from "./config/env.js";
 import userRouter from "./routes/user.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import linksRouter from "./routes/link.routes.js";
@@ -20,6 +20,8 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(arcjetMiddleware);
 
+connectToDatabase();
+
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/links', linksRouter);
 app.use('/api/v1/auth', authRouter);
@@ -27,9 +29,7 @@ app.use('/api/v1/auth', authRouter);
 app.use(errorMiddleware);
 
 app.get('/', (req, res) => {
-  res.send('Welcome to cratco api!');
+    res.send('Welcome to cratco api!');
 });
 
-app.listen(PORT, async () => {
-    await connectToDatabase();
-})
+export default app;
