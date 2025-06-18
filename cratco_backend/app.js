@@ -1,5 +1,5 @@
 import express from 'express';
-import {FRONTEND_URL} from "./config/env.js";
+import {FRONTEND_URL, PORT} from "./config/env.js";
 import userRouter from "./routes/user.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import linksRouter from "./routes/link.routes.js";
