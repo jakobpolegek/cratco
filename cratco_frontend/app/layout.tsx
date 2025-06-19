@@ -25,16 +25,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-background">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <AuthProvider>
-              <NavigationBar/>
-              <div id="content" className="mx-5 mt-5" >
-                  {children}
-              </div>
-          </AuthProvider>
+      <html lang="en" className="bg-background">
+          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+              <AuthProvider>
+                  <NavigationBar/>
+                  <div id="content" className="mx-5 mt-20 pt-4 min-h-screen">
+                      {children}
+                  </div>
+              </AuthProvider>
           </body>
-    </html>
+      </html>
   );
 }

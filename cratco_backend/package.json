@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
+    "start": "NODE_ENV=development node server.js",
+    "start:prod": "NODE_ENV=production nodenode server.js",
+    "dev": "NODE_ENV=development nodemon server.js",
     "build": "echo 'This is an Express app. No need to build anything.'"
   },
   "dependencies": {

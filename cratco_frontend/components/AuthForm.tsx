@@ -37,7 +37,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     };
 
     return (
-        <div className="max-w-md mx-auto mt-8 p-6 bg-blend-darken rounded-lg shadow-md">
+        <div className="max-w-md mx-auto mt-8 p-6 bg-darken rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-6 text-center">
                 {mode === 'login' ? 'Sign In' : 'Sign Up'}
             </h2>

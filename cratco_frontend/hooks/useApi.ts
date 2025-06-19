@@ -25,12 +25,12 @@ export function useApi() {
 
         if (response.status === 401) {
             logout();
-            throw new Error('Authentication failed');
+            throw new Error('Authentication failed.');
         }
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.message || 'API call failed');
+            throw new Error(error.message || 'API call failed.');
         }
 
         return response;

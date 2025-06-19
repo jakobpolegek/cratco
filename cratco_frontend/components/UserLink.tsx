@@ -24,7 +24,6 @@ export function UserLink({linkId}: { linkId: string }) {
         setLinkToDelete(null);
         setAlert(null);
         modalRef.current?.close();
-
     };
 
     useEffect(() => {
@@ -41,7 +40,7 @@ export function UserLink({linkId}: { linkId: string }) {
         };
 
         fetchLink();
-    }, [apiCall, linkId]);
+    }, [linkId]);
 
     return (
         <div className="flex justify-center mt-8">
