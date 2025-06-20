@@ -47,6 +47,8 @@ export class AuthService {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, no-cache, must-revalidate',
+                'Pragma': 'no-cache'
             },
             body: JSON.stringify({ email, password }),
         });

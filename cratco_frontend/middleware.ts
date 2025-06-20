@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
 
     const isInternalPath = internalPaths.some(path =>
         path === '/' ? pathname === path : pathname.startsWith(path)
-    );
+    ) || pathname.match(/^\/my-links\/[^\/]+$/);
 
     if (!isInternalPath) {
         try {
@@ -70,8 +70,18 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
+    if (pathname === '/' || pathname.startsWith('/my-links')) {
+        if (!token) {
+            return NextResponse.redirect(new URL('/login', request.url), {
+                status: 307
+            });
+        }
+    }
+
     if (!token) {
-        return NextResponse.redirect(new URL('/login', request.url));
+        return NextResponse.redirect(new URL('/login', request.url), {
+            status: 307
+        });
     }
 
     return NextResponse.next();

@@ -42,7 +42,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             Cookies.set('user', JSON.stringify({_id, name, email: userEmail, createdAt, updatedAt}), {
                 expires: 7,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict'
+                sameSite: 'lax',
+                path: '/'
             });
         } catch (error) {
             throw error;
@@ -61,7 +62,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             Cookies.set('user', JSON.stringify({_id, name, email: userEmail, createdAt, updatedAt}), {
                 expires: 7,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict'
+                sameSite: 'lax',
+                path: '/'
             });
         } catch (error) {
             throw error;
