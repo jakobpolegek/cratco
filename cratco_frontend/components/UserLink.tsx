@@ -6,9 +6,11 @@ import {iLink} from "@/types/iLink";
 import {ArrowRight, Copy, Trash, Edit} from "@deemlol/next-icons";
 import DeleteLinkModal from "@/components/DeleteLinkModal";
 import CreateEditLinkModal from "@/components/CreateEditLinkModal";
+import {useAuth} from "@/contexts/AuthContext";
 
 export function UserLink({linkId}: { linkId: string }) {
     const {apiCall} = useApi();
+    const { loading: authLoading } = useAuth();
     const [link, setLink] = useState<iLink>();
     const [loading, setLoading] = useState(true);
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -28,6 +30,10 @@ export function UserLink({linkId}: { linkId: string }) {
 
     useEffect(() => {
         const fetchLink = async () => {
+            if (authLoading) {
+                return;
+            }
+
             try {
                 const res = await apiCall(`/links/${linkId}`);
                 const {data} = await res.json();
@@ -40,7 +46,15 @@ export function UserLink({linkId}: { linkId: string }) {
         };
 
         fetchLink();
-    }, [linkId]);
+    }, [linkId, authLoading]);
+
+    if (authLoading) {
+        return (
+            <div className="flex justify-center mt-8">
+                <span className="loading loading-infinity loading-xl"></span>
+            </div>
+        );
+    }
 
     return (
         <div className="flex justify-center mt-8">
