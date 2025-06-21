@@ -6,6 +6,7 @@ import { useApi } from "@/hooks/useApi";
 import {iLink} from "@/types/iLink";
 import {ArrowRight, Copy, Trash} from "@deemlol/next-icons";
 import DeleteLinkModal from "@/components/DeleteLinkModal";
+import {LinkVisitsChart} from "@/components/charts/LinkVisitsChart";
 
 export function UserLinks() {
     const {apiCall} = useApi();
@@ -68,11 +69,12 @@ export function UserLinks() {
                 <span className="loading loading-infinity loading-xl"></span>
             ) : (
                 <div>
+                    <LinkVisitsChart data={links.filter(link => (link.visits || 0) > 0)}/>
                     {links?.length === 0 ? <div>No links yet.</div> :
-                        <ul className="list text-center">
-                            <li className="text-xl opacity-60 tracking-wide">My links:</li>
+                        <ul className="list text-center flex items-center gap-4">
+                            <li className="text-xl uppercase font-semibold text-white opacity-80 tracking-wid">My links:</li>
                             {links?.map((link) => (
-                                <li className="list-row bg-base-100 rounded-box shadow-md my-2 p-4" key={link._id}>
+                                <li className="list-row bg-base-100 rounded-box shadow-md w-4/5 lg:w-auto lg:p-4" key={link._id}>
                                     <div>
                                         <Link href={`/my-links/${link._id}`}>
                                             <div className="list-col-grow mb-1">

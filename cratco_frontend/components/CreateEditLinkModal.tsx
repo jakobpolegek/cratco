@@ -128,26 +128,26 @@ const CreateEditLinkModal = forwardRef<HTMLDialogElement, CreateEditLinkModalPro
                     </div>
                 )}
 
-                <div className="flex flex-col gap-4 items-center w-full">
-                    {mode==='edit' && <label htmlFor="name" className="text-sm font-medium text-gray-500">Link name:</label>}
+                <div className="flex flex-col items-center w-full">
+                    {mode==='edit' && <label htmlFor="name" className="text-sm font-medium text-gray-500 mb-1">Link name:</label>}
                     <input
                     type="text"
                     placeholder="Name of your link"
-                    className="input input-primary w-full"
+                    className="input input-primary w-full mb-4"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     disabled={isSubmitting}
                     />
-                    {mode==='edit' && <label htmlFor="originalAddress" className="text-sm font-medium text-gray-500">Original address:</label>}
+                    {mode==='edit' && <label htmlFor="originalAddress" className="text-sm font-medium text-gray-500 mb-1">Original address:</label>}
                     <input
                         type="text"
                         placeholder="Original link"
-                        className="input input-primary w-full"
+                        className="input input-primary w-full mb-4"
                         value={formData.originalAddress}
                         onChange={(e) => handleInputChange('originalAddress', e.target.value)}
                         disabled={isSubmitting}
                     />
-                    {mode==='edit' && <label htmlFor="originalAddress" className="text-sm font-medium text-gray-500">Custom address:</label>}
+                    {mode==='edit' && <label htmlFor="originalAddress" className="text-sm font-medium text-gray-500 mb-1">Custom address:</label>}
                     <input
                         type="text"
                         placeholder="Custom address"
