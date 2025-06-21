@@ -1,4 +1,6 @@
-export const CustomTooltip = ({active, payload, label}: { active: boolean; payload: any[]; label: string }) => {
+import {iLink} from "@/types/iLink";
+
+export const CustomTooltip = ({active, payload, label}: { active: boolean; payload: iLink[]; label: string }) => {
     if (active && payload?.length) {
         return (
             <div className="bg-base-300 rounded-box shadow-md p-4">
@@ -6,7 +8,7 @@ export const CustomTooltip = ({active, payload, label}: { active: boolean; paylo
                 <br/>
                 {payload.map((ele, index) => (
                     <small key={index} className="text-secondary">
-                        {ele.name} : {ele.value}
+                        {ele.name} : {ele.visits}
                     </small>
                 ))}
             </div>
