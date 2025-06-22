@@ -1,40 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
-import {AuthFormProps} from "@/types/AuthFormProps";
+import { useActionState } from 'react';
+import { signIn, signUp } from '@/lib/auth/actions';
+import { AuthFormProps } from "@/types/AuthFormProps";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export function AuthForm({ mode }: AuthFormProps) {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-    });
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const action = mode === 'login' ? signIn : signUp;
 
-    const { login, register } = useAuth();
-    const router = useRouter();
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        setIsLoading(true);
-
-        try {
-            if (mode === 'login') {
-                await login(formData.email, formData.password);
-            } else {
-                await register(formData.name, formData.email, formData.password);
-            }
-            router.push('/');
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const [state, formAction] = useActionState(action, undefined);
 
     return (
         <div className="max-w-md mx-auto mt-8 p-6 bg-darken rounded-lg shadow-md">
@@ -42,7 +16,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 {mode === 'login' ? 'Sign In' : 'Sign Up'}
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form action={formAction} className="space-y-4">
                 {mode === 'register' && (
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-500">
@@ -51,10 +25,9 @@ export function AuthForm({ mode }: AuthFormProps) {
                         <input
                             type="text"
                             id="name"
+                            name="name"
                             required
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         />
                     </div>
                 )}
@@ -66,10 +39,9 @@ export function AuthForm({ mode }: AuthFormProps) {
                     <input
                         type="email"
                         id="email"
+                        name="email"
                         required
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     />
                 </div>
 
@@ -80,26 +52,17 @@ export function AuthForm({ mode }: AuthFormProps) {
                     <input
                         type="password"
                         id="password"
+                        name="password"
                         required
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     />
                 </div>
 
-                {error && (
-                    <div className="text-red-600 text-sm">{error}</div>
+                {state?.error && (
+                    <div className="text-red-600 text-sm">{state.error}</div>
                 )}
 
-                {isLoading ? <div className="flex justify-center"><span className="flex justify-center items-align-center mt-8 loading loading-infinity loading-xl"></span>
-                    </div> :
-                    <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                >
-                    {(mode === 'login' ? 'Sign In' : 'Sign Up')}
-                </button>}
+                <SubmitButton mode={mode} />
             </form>
         </div>
     );

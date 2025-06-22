@@ -1,4 +1,4 @@
-export interface iLink {
+export interface ILink {
     _id: string;
     name: string;
     originalAddress: string;

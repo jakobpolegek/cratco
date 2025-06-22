@@ -1,6 +1,6 @@
-import {iLink} from "@/types/iLink";
+import {ILink} from "@/types/ILink";
 
-export const CustomTooltip = ({active, payload, label}: { active: boolean; payload: iLink[]; label: string }) => {
+export const CustomTooltip = ({active, payload, label}: { active: boolean; payload: ILink[]; label: string }) => {
     if (active && payload?.length) {
         return (
             <div className="bg-base-300 rounded-box shadow-md p-4">

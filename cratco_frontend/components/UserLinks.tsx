@@ -2,19 +2,20 @@
 
 import {useEffect, useRef, useState} from 'react';
 import Link from "next/link";
-import { useApi } from "@/hooks/useApi";
-import {iLink} from "@/types/iLink";
+import {useSearchParams} from 'next/navigation';
+import {ILink} from "@/types/ILink";
 import {ArrowRight, Copy, Trash} from "@deemlol/next-icons";
 import DeleteLinkModal from "@/components/DeleteLinkModal";
 import {LinkVisitsChart} from "@/components/charts/LinkVisitsChart";
+import {getLinks} from "@/lib/links/actions";
 
 export function UserLinks() {
-    const {apiCall} = useApi();
-    const [links, setLinks] = useState<iLink[]>([]);
+    const [links, setLinks] = useState<ILink[]>([]);
     const [loading, setLoading] = useState(true);
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [linkToDelete, setLinkToDelete] = useState<{ id: string; name: string } | null>(null);
     const modalRef = useRef<HTMLDialogElement>(null);
+    const searchParams = useSearchParams();
 
     const openModal = (linkId: string, linkName: string) => {
         setLinkToDelete({ id: linkId, name: linkName });
@@ -30,8 +31,7 @@ export function UserLinks() {
 
     const fetchLinks = async () => {
         try {
-            const res = await apiCall('/links');
-            const { data } = await res.json();
+            const data = await getLinks();
             setLinks(data);
         } catch (error) {
             console.error('Failed to fetch links:', error);
@@ -41,20 +41,27 @@ export function UserLinks() {
     };
 
     useEffect(() => {
-        const initialFetch = async () => {
-            try {
-                const res = await apiCall('/links');
-                const { data } = await res.json();
-                setLinks(data);
-            } catch (error) {
-                console.error('Failed to fetch links:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        initialFetch();
+        fetchLinks();
     }, []);
+
+    useEffect(() => {
+        const deleted = searchParams.get('deleted');
+        const linkName = searchParams.get('name');
+
+        if (deleted === 'true') {
+            setAlert({
+                type: 'success',
+                message: `"${linkName}" has been successfully deleted!`
+            });
+
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+
+            setTimeout(() => {
+                setAlert(null);
+            }, 4000);
+        }
+    }, [searchParams]);
 
     return (
         <div className="flex justify-center my-8">
@@ -69,10 +76,13 @@ export function UserLinks() {
                 <span className="loading loading-infinity loading-xl"></span>
             ) : (
                 <div>
-                    <LinkVisitsChart data={links.filter(link => (link.visits || 0) > 0)}/>
                     {links?.length === 0 ? <div>No links yet.</div> :
                         <ul className="list text-center flex items-center gap-4">
-                            <li className="text-xl uppercase font-semibold text-white opacity-80 tracking-wid">My links:</li>
+                            {links.some(link => (link.visits || 0) > 0) &&
+                                <LinkVisitsChart data={links.filter(link => (link.visits || 0) > 0)}/>}
+                            <li className="text-xl uppercase font-semibold text-white opacity-80 tracking-wid">My
+                                links:
+                            </li>
                             {links?.map((link) => (
                                 <li className="list-row bg-base-100 rounded-box shadow-md w-4/5 lg:w-auto lg:p-4" key={link._id}>
                                     <div>

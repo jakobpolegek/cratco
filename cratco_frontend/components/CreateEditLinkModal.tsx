@@ -1,16 +1,10 @@
 'use client';
 
 import { useState, forwardRef, useEffect } from 'react';
-import { useApi } from "@/hooks/useApi";
-import { iLink } from "@/types/iLink";
+import {ICreateEditLinkModalProps} from "@/types/ICreateEditLinkModalProps";
+import {createOrUpdateLink} from "@/lib/links/actions";
 
-interface CreateEditLinkModalProps {
-    onClose: () => void;
-    editLink?: iLink | null;
-    mode?: 'create' | 'edit';
-}
-
-const CreateEditLinkModal = forwardRef<HTMLDialogElement, CreateEditLinkModalProps>(({ onClose, editLink = null, mode = 'create' }, ref) => {
+const CreateEditLinkModal = forwardRef<HTMLDialogElement, ICreateEditLinkModalProps>(({ onClose, editLink = null, mode = 'create' }, ref) => {
     const [formData, setFormData] = useState({
         name: '',
         originalAddress: '',
@@ -18,7 +12,6 @@ const CreateEditLinkModal = forwardRef<HTMLDialogElement, CreateEditLinkModalPro
     });
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { apiCall } = useApi();
 
     useEffect(() => {
         if (mode === 'edit' && editLink) {
@@ -34,7 +27,6 @@ const CreateEditLinkModal = forwardRef<HTMLDialogElement, CreateEditLinkModalPro
                 customAddress: ''
             });
         }
-        setAlert(null);
     }, [mode, editLink]);
 
     const clearForm = () => {
@@ -59,57 +51,41 @@ const CreateEditLinkModal = forwardRef<HTMLDialogElement, CreateEditLinkModalPro
     };
 
     const submitForm = async () => {
-        try {
-            if (!formData.originalAddress.trim()) {
-                setAlert({ type: 'error', message: 'Original link is required!' });
-                return;
-            }
+        if (!formData.originalAddress.trim()) {
+            setAlert({ type: 'error', message: 'Original link is required!' });
+            return;
+        }
+        if (!URL.canParse(formData.originalAddress)) {
+            setAlert({ type: 'error', message: 'Please enter a valid URL.' });
+            return;
+        }
 
-            if (!URL.canParse(formData.originalAddress)) {
-                setAlert({ type: 'error', message: 'Please enter a valid URL.' });
-                return;
-            }
+        setIsSubmitting(true);
+        setAlert(null);
 
-            setIsSubmitting(true);
-            setAlert(null);
+        const result = await createOrUpdateLink({
+            ...formData,
+            _id: mode === 'edit' ? editLink?._id : undefined,
+            mode: mode,
+        });
 
-            const body = JSON.stringify({
-                name: formData.name,
-                originalAddress: formData.originalAddress,
-                customAddress: formData.customAddress,
-                ...(mode === 'create' && { startDate: new Date() })
-            });
-
-            let res;
-            if (mode === 'edit' && editLink) {
-                res = await apiCall(`/links/${editLink._id}`, {
-                    method: 'PUT',
-                    body
-                });
-            } else {
-                res = await apiCall('/links', {
-                    method: 'POST',
-                    body
-                });
-            }
+        if (result.success) {
             const successMessage = mode === 'edit' ? 'Link successfully updated!' : 'Link successfully created!';
-
-            if ((mode === 'create' && res.status===201) || (mode === 'edit' && res)) {
-                setAlert({ type: 'success', message: `${successMessage} This window will close in 3 seconds.` });
-                setTimeout(() => {
-                    clearForm();
-                    setIsSubmitting(false);
-                    onClose();
-                }, 3000);
-            } else {
-                const errorMessage = mode === 'edit' ? 'Failed to update link.' : 'Failed to create link.';
-                setAlert({ type: 'error', message: `${errorMessage} Please try again.` });
+            setAlert({ type: 'success', message: `${successMessage} This window will automatically close.` });
+            setTimeout(() => {
                 setIsSubmitting(false);
-            }
-        } catch {
-            const errorMessage = mode === 'edit' ? 'Failed to update link.' : 'An error occurred while creating the link.';
-            setAlert({type: 'error', message: `${errorMessage} Please try again.`});
-            setIsSubmitting(false);
+                setAlert(null);
+                clearForm();
+                onClose();
+            }, 3000);
+        } else {
+            setAlert({ type: 'error', message: result.error || 'An unknown error occurred.' });
+            setTimeout(() => {
+                setIsSubmitting(false);
+                setAlert(null);
+                clearForm();
+                onClose();
+            }, 5000);
         }
     };
 

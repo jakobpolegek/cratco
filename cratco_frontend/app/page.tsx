@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import CreateEditLinkModal from '@/components/CreateEditLinkModal';
+export const dynamic = 'force-dynamic';
 
 export default function HomePage() {
     const { user, loading } = useAuth();
@@ -24,16 +25,11 @@ export default function HomePage() {
         }
     }, [user, loading, router]);
 
-    if (loading) {
-        return (
-            <div className="flex justify-center mt-8">
-                <span className="loading loading-infinity loading-xl"></span>
-            </div>
-        );
-    }
-
     return (
         <div className="flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8 min-h-[calc(100vh-8rem)]">
+            {loading ? <div className="w-full max-w-md">
+                <span className="loading loading-infinity loading-xl"></span>
+            </div> :
             <div className="w-full max-w-md">
                 <h1 className="text-3xl font-bold text-center text-gray-50">
                     Welcome to crat.co
@@ -53,7 +49,7 @@ export default function HomePage() {
                         mode="create"
                     />
                 </div>
-            </div>
+            </div>}
         </div>
 
     );

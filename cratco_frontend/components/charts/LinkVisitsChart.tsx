@@ -1,8 +1,8 @@
 import {Bar, BarChart, Tooltip, XAxis, YAxis} from "recharts";
-import {iLink} from "@/types/iLink";
+import {ILink} from "@/types/ILink";
 import {CustomTooltip} from "@/components/CustomChartTooltip";
 
-export const LinkVisitsChart = ({data = []}: { data: iLink[] }) => {
+export const LinkVisitsChart = ({data = []}: { data: ILink[] }) => {
     return (
         <div className="bg-base-100 rounded-box shadow-md lg:fixed lg:top-30 lg:right-10 w-4/5 lg:w-auto mx-auto">
             <div className="text-center text-xl uppercase font-semibold text-white opacity-80 tracking-wid py-4">

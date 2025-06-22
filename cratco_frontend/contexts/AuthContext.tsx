@@ -1,93 +1,55 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { AuthService } from '@/lib/AuthService';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
+import { signOut } from '@/lib/auth/actions';
 import { User } from '@/types/Auth';
 import { AuthContextType } from '@/types/AuthContextType';
-import Cookies from "js-cookie";
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<Omit<AuthContextType, 'login' | 'register' | 'token'> | undefined>(undefined);
+
+const publicPaths = ['/login', '/register'];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const pathname = usePathname();
+
+    const fetchUser = useCallback(async () => {
+        if (publicPaths.some(path => pathname.startsWith(path))) {
+            setUser(null);
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/auth/me');
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data.user);
+            } else {
+                setUser(null);
+            }
+        } catch (error) {
+            console.error("Failed to fetch user", error);
+            setUser(null);
+        } finally {
+            setLoading(false);
+        }
+    }, [pathname]);
 
     useEffect(() => {
-        const initAuth = () => {
-            const storedToken = AuthService.getToken();
-            const storedUser = Cookies.get('user');
-
-            if (storedToken && !AuthService.isTokenExpired(storedToken) && storedUser) {
-                setToken(storedToken);
-                setUser(JSON.parse(storedUser));
-            } else {
-                AuthService.signOut();
-                Cookies.remove('user');
-            }
-
-            setLoading(false);
-        };
-
-        initAuth();
-    }, []);
-
-    const login = async (email: string, password: string) => {
-        setLoading(true);
-        try {
-            const response = await AuthService.signIn(email, password);
-            setToken(response.data.token);
-            setUser(response.data.user);
-            const {_id, name, email: userEmail, createdAt, updatedAt} = response.data.user;
-            Cookies.set('user', JSON.stringify({_id, name, email: userEmail, createdAt, updatedAt}), {
-                expires: 7,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                path: '/'
-            });
-        } catch (error) {
-            throw error;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const register = async (name: string, email: string, password: string) => {
-        setLoading(true);
-        try {
-            const response = await AuthService.signUp(name, email, password);
-            setToken(response.data.token);
-            setUser(response.data.user);
-            const {_id, email: userEmail, createdAt, updatedAt} = response.data.user;
-            Cookies.set('user', JSON.stringify({_id, name, email: userEmail, createdAt, updatedAt}), {
-                expires: 7,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                path: '/'
-            });
-        } catch (error) {
-            throw error;
-        } finally {
-            setLoading(false);
-        }
-    };
+        fetchUser();
+    }, [fetchUser]);
 
     const logout = async () => {
-        try {
-            await AuthService.signOut();
-        } catch (error) {
-            console.error("Logout API call failed, proceeding with local logout.", error);
-            AuthService.removeStoredToken();
-            Cookies.remove('user');
-        } finally {
-            setToken(null);
-            setUser(null);
-        }
+        setUser(null);
+        await signOut();
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
-            {children}
+        <AuthContext.Provider value={{ user, logout, loading }}>
+            {!loading && children}
         </AuthContext.Provider>
     );
 }
