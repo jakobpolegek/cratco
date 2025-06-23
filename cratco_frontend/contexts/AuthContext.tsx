@@ -3,15 +3,15 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { signOut } from '@/lib/auth/actions';
-import { User } from '@/types/Auth';
-import { AuthContextType } from '@/types/AuthContextType';
+import { IUser } from '@/types/IUser';
+import { IAuthContextType } from '@/types/IAuthContextType';
 
-const AuthContext = createContext<Omit<AuthContextType, 'login' | 'register' | 'token'> | undefined>(undefined);
+const AuthContext = createContext<Omit<IAuthContextType, 'login' | 'register' | 'token'> | undefined>(undefined);
 
 const publicPaths = ['/login', '/register'];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<IUser | null>(null);
     const [loading, setLoading] = useState(true);
     const pathname = usePathname();
 

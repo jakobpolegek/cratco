@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import type { AuthResponse } from "@/types/AuthResponse";
+import type { IAuthResponse } from "@/types/IAuthResponse";
 import {ActionState} from "@/types/ActionState";
 
 export async function signIn(
@@ -19,7 +19,7 @@ export async function signIn(
             body: JSON.stringify({ email, password }),
         });
 
-        const data: AuthResponse = await response.json();
+        const data: IAuthResponse = await response.json();
 
         if (!response.ok) {
             return { error: data.message || 'Sign in failed.' };
@@ -55,7 +55,7 @@ export async function signUp(
             body: JSON.stringify({ name, email, password }),
         });
 
-        const data: AuthResponse = await response.json();
+        const data: IAuthResponse = await response.json();
 
         if (!response.ok) {
             return { error: data.message || 'Sign up failed.' };

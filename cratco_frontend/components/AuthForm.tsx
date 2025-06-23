@@ -2,10 +2,10 @@
 
 import { useActionState } from 'react';
 import { signIn, signUp } from '@/lib/auth/actions';
-import { AuthFormProps } from "@/types/AuthFormProps";
+import { IAuthFormProps } from "@/types/IAuthFormProps";
 import { SubmitButton } from "@/components/SubmitButton";
 
-export function AuthForm({ mode }: AuthFormProps) {
+export function AuthForm({ mode }: IAuthFormProps) {
     const action = mode === 'login' ? signIn : signUp;
 
     const [state, formAction] = useActionState(action, undefined);

@@ -1,9 +1,11 @@
-import {getLink} from '@/lib/links/actions';
-import {UserLink} from "@/components/UserLink";
-import Link from "next/link";
+import { getLink } from '@/lib/links/actions';
+import { UserLink } from '@/components/UserLink';
+import Link from 'next/link';
+import { LinkPageProps } from '@/types/LinkPageProps';
 
-export default async function LinkPage({ params }: { params: { linkId: string } }) {
-    const linkId = params.linkId;
+export default async function LinkPage({ params }: LinkPageProps) {
+    const resolvedParams = await params;
+    const linkId = resolvedParams.linkId;
     const link = await getLink(linkId, true);
 
     if (!link) {
@@ -16,5 +18,5 @@ export default async function LinkPage({ params }: { params: { linkId: string } 
         );
     }
 
-    return <UserLink link={link}/>;
+    return <UserLink link={link} />;
 }

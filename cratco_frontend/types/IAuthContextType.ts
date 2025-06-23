@@ -1,7 +1,7 @@
-import {User} from "@/types/Auth";
+import {IUser} from "@/types/IUser";
 
-export interface AuthContextType {
-    user: User | null;
+export interface IAuthContextType {
+    user: IUser | null;
     token: string | null;
     login: (email: string, password: string) => Promise<void>;
     register: (name: string, email: string, password: string) => Promise<void>;
