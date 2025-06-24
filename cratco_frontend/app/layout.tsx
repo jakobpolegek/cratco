@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { NavigationBar } from "@/components/NavigationBar";
 import { AuthProvider } from '@/contexts/AuthContext';
+import NextAuthProvider from "@/components/Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,20 +21,22 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
+                                       children,
+                                   }: Readonly<{
+    children: React.ReactNode;
 }>) {
-  return (
-      <html lang="en" className="bg-background">
-          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-              <AuthProvider>
-                  <NavigationBar/>
-                  <div id="content" className="mx-5 mt-20 pt-4 min-h-screen">
-                      {children}
-                  </div>
-              </AuthProvider>
-          </body>
-      </html>
-  );
+    return (
+        <html lang="en" className="bg-background">
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+                <NextAuthProvider>
+                    <AuthProvider>
+                        <NavigationBar/>
+                        <div id="content" className="mx-5 mt-20 pt-4 min-h-screen">
+                            {children}
+                        </div>
+                    </AuthProvider>
+                </NextAuthProvider>
+            </body>
+        </html>
+    );
 }

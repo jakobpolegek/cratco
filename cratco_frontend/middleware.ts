@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
 const publicOnlyPaths = ['/login', '/register'];
 const protectedPaths = ['/my-links'];
@@ -7,7 +8,11 @@ const allAppPaths = ['/', '/login', '/register', '/my-links', '/about'];
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    const token = request.cookies.get('token')?.value;
+
+    const token = await getToken({
+        req: request,
+        secret: process.env.NEXTAUTH_SECRET
+    });
 
     if (token && publicOnlyPaths.some(path => pathname.startsWith(path))) {
         return NextResponse.redirect(new URL('/', request.url));
@@ -59,6 +64,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/((?!api|_next/static|_next/image|favicon\\.ico|\\.well-known).*)',
+        '/((?!api/auth|_next/static|_next/image|favicon\\.ico|\\.well-known).*)',
     ],
 };

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import {JWT_SECRET} from "../config/env.js";
+import {JWT_SECRET, PUBLIC_LINKS_SECRET} from "../config/env.js";
 import User from "../models/user.model.js";
 
 export const authorize = async (req, res, next) => {
@@ -9,7 +9,7 @@ export const authorize = async (req, res, next) => {
         if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             token = req.headers.authorization.split(' ')[1];
         }
-
+        
         if (!token) {
             const error = new Error('Unauthorized.');
             error.status = 401;
@@ -34,7 +34,7 @@ export const authorizePublicUrl = async (req, res, next) => {
     try {
         if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             const token = req.headers.authorization.split(' ')[1];
-            if (token === process.env.PUBLIC_LINKS_SECRET) {
+            if (token === PUBLIC_LINKS_SECRET) {
                 return next();
             }
         }

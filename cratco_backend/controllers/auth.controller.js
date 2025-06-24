@@ -50,11 +50,58 @@ export const signIn = async (req, res, next) => {
         }
 
         const token = jwt.sign({userId: user._id}, JWT_SECRET, {expiresIn: JWT_EXPIRES_IN});
-        res.status(200).json({success: true, message: 'User logged in successfully!', data: {token}});
+        res.status(200).json({
+            success: true,
+            message: 'User logged in successfully!',
+            data: {
+                user: {
+                    _id: user._id,
+                    email: user.email,
+                    name: user.name || ''
+                },
+                token
+            }
+        });
     } catch (error) {
         next(error);
     }
 }
+
+export const socialLogin = async (req, res, next) => {
+    try {
+        const { email, name, provider } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Email from social provider is required.' });
+        }
+
+        let user = await User.findOne({ email });
+
+        if (user) {
+            if (user.authMethod !== provider) {
+                return res.status(403).json({
+                    success: false,
+                    message: `You have already signed up with your email and password. Please log in using that method.`
+                });
+            }
+
+        } else {
+            user = await User.create({
+                name,
+                email,
+                authMethod: provider,
+            });
+        }
+
+        const token = jwt.sign({userId: user._id}, JWT_SECRET, {expiresIn: JWT_EXPIRES_IN});
+        const userDTO = { _id: user._id, name: user.name, email: user.email };
+
+        res.status(200).json({ success: true, data: { token, user: userDTO } });
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 export const signOut = async (req, res, next) => {
     try {

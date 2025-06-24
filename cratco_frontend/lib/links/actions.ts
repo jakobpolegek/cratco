@@ -1,19 +1,21 @@
 "use server";
 
-import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import {ILink} from "@/types/ILink";
 import {notFound} from 'next/navigation';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from '@/lib/auth/authOptions';
 
 const API_SRC = process.env.NEXT_PUBLIC_API_SRC;
 
 export async function getLinks(): Promise<ILink[]> {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
+    const session = await getServerSession(authOptions);
 
-    if (!token) {
-        throw new Error('getLinks: No token found, user is not authenticated.');
+    if (!session?.customToken) {
+        throw new Error(`Unauthorized.`);
     }
+
+    const token = session.customToken;
 
     try {
         const res = await fetch(`${API_SRC}/links`, {
@@ -36,13 +38,13 @@ export async function getLinks(): Promise<ILink[]> {
     }
 }
 
-export async function getLink(linkId: string, ignoreNotFound = false): Promise<ILink | null> {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
-    if (!token) {
-        throw new Error('getLink: No token found, user is not authenticated.');
+export async function getLink(linkId: string, ignoreNotFound = false): Promise<ILink> {
+    const session = await getServerSession(authOptions);
+    if (!session?.customToken) {
+        throw new Error(`Unauthorized.`);
     }
+
+    const token = session.customToken;
 
     try {
         const res = await fetch(`${API_SRC}/links/${linkId}`, {
@@ -56,7 +58,7 @@ export async function getLink(linkId: string, ignoreNotFound = false): Promise<I
             if (!ignoreNotFound) {
                 notFound();
             }
-            return null;
+            throw new Error(`Link not found. Status: ${res.status}`);
         }
 
         if (!res.ok) {
@@ -74,8 +76,13 @@ export async function getLink(linkId: string, ignoreNotFound = false): Promise<I
 export async function createOrUpdateLink(
     formData: ILinkFormData
 ): Promise<{ success: boolean; error?: string }> {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
+    const session = await getServerSession(authOptions);
+
+    if (!session?.customToken) {
+        return { success: false, error: 'Unauthorized.' };
+    }
+
+    const token = session.customToken;
 
     if (!token) {
         return { success: false, error: 'Unauthorized.' };
@@ -112,7 +119,6 @@ export async function createOrUpdateLink(
             },
             body: JSON.stringify(bodyPayload),
         });
-
         if (!response.ok) {
             const errorData = await response.json();
             return { success: false, error: errorData.message || 'API request failed.' };
@@ -131,15 +137,17 @@ export async function createOrUpdateLink(
     }
 }
 
+
 export async function deleteLink(
     linkId: string,
 ): Promise<{ success: boolean; error?: string }> {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
+    const session = await getServerSession(authOptions);
 
-    if (!token) {
-        return { success: false, error: 'Unauthorized. Please log in again.' };
+    if (!session?.customToken) {
+        return { success: false, error: 'Unauthorized.' };
     }
+
+    const token = session.customToken;
 
     try {
         const response = await fetch(`${API_SRC}/links/${linkId}`, {

@@ -3,4 +3,4 @@ import process from 'process';
 
 config({path: `.env.${process.env.NODE_ENV || 'development'}.local`});
 
-export const {PORT, NODE_ENV, DB_URI, JWT_SECRET, JWT_EXPIRES_IN, FRONTEND_URL, ARCJET_KEY} = process.env;
+export const {PORT, NODE_ENV, DB_URI, JWT_SECRET, JWT_EXPIRES_IN, FRONTEND_URL, ARCJET_KEY,PUBLIC_LINKS_SECRET} = process.env;

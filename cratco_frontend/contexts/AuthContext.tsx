@@ -1,50 +1,35 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { usePathname } from 'next/navigation';
-import { signOut } from '@/lib/auth/actions';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useSession, signOut as nextAuthSignOut } from 'next-auth/react';
 import { IUser } from '@/types/IUser';
 import { IAuthContextType } from '@/types/IAuthContextType';
 
 const AuthContext = createContext<Omit<IAuthContextType, 'login' | 'register' | 'token'> | undefined>(undefined);
 
-const publicPaths = ['/login', '/register'];
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<IUser | null>(null);
     const [loading, setLoading] = useState(true);
-    const pathname = usePathname();
-
-    const fetchUser = useCallback(async () => {
-        if (publicPaths.some(path => pathname.startsWith(path))) {
-            setUser(null);
-            setLoading(false);
-            return;
-        }
-
-        try {
-            const res = await fetch('/api/auth/me');
-            if (res.ok) {
-                const data = await res.json();
-                setUser(data.user);
-            } else {
-                setUser(null);
-            }
-        } catch (error) {
-            console.error("Failed to fetch user", error);
-            setUser(null);
-        } finally {
-            setLoading(false);
-        }
-    }, [pathname]);
+    const { data: session, status } = useSession();
 
     useEffect(() => {
-        fetchUser();
-    }, [fetchUser]);
+        if (status === 'loading') {
+            setLoading(true);
+        } else if (status === 'authenticated') {
+
+            setUser({
+                name: session.user?.name,
+                email: session.user?.email,
+            } as IUser);
+            setLoading(false);
+        } else {
+            setUser(null);
+            setLoading(false);
+        }
+    }, [session, status]);
 
     const logout = async () => {
-        setUser(null);
-        await signOut();
+        await nextAuthSignOut({ callbackUrl: '/login' });
     };
 
     return (

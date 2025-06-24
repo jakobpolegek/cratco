@@ -1,13 +1,15 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth/authOptions";
 
 export async function GET() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
+    const session = await getServerSession(authOptions);
 
-    if (!token) {
-        return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+    if (!session?.customToken) {
+        throw new Error(`Unauthorized.`);
     }
+
+    const token = session.customToken;
 
     try {
         const apiBaseUrl = process.env.NEXT_PUBLIC_API_SRC;

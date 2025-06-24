@@ -16,9 +16,15 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Email is required!'],
         match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
     },
+    authMethod: {
+        type: String,
+        enum: ['local', 'google'],
+        required: true,
+        default: 'local'
+    },
     password: {
         type: String,
-        required: [true, 'Password is required!'],
+        required: function() { return this.authMethod === 'local'; },
         minLength: 8
     },
 }, {timestamps: true});
