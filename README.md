@@ -1,2 +1,2 @@
 # cratco
-URL shortening app built with Express backend and Next.js frontend.
+A URL shortening app built with an Express backend and a Next.js frontend.
