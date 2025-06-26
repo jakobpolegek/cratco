@@ -25,8 +25,7 @@ export const authOptions: AuthOptions = {
             async authorize(credentials) {
 
                 if (!credentials?.email || !credentials?.password) {
-                    console.error("Missing credentials.");
-                    return null;
+                    throw new Error("Missing credentials.");
                 }
 
                 try {
@@ -40,28 +39,23 @@ export const authOptions: AuthOptions = {
                     });
 
                     if (!response.ok) {
-                        console.log("Backend returned error");
-                        return null;
+                        throw new Error("Backend returned error.");
                     }
 
                     const { data } = await response.json();
 
                     if (!data?.user?._id || !data?.token) {
-                        console.log("Invalid response structure");
-                        return null;
+                        throw new Error("Invalid response from backend.");
                     }
 
-                    const user = {
+                    return {
                         id: data.user._id,
                         email: data.user.email,
                         name: data.user.name || "",
                         customToken: data.token
                     };
-
-                    return user;
                 } catch (error) {
-                    console.error("Authorization error:", error);
-                    return null;
+                    throw new Error(`Authorization error: ${error}`);
                 }
             }
         })
@@ -89,8 +83,7 @@ export const authOptions: AuthOptions = {
                         token.customToken = data.token;
                         token.id = data.user._id;
                     } catch (error) {
-                        console.error("Error during social login bridge:", error);
-                        throw error;
+                        throw new Error(`Error during social login bridge: ${error}`);
                     }
                 }
 

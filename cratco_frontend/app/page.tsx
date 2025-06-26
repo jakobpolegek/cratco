@@ -35,7 +35,7 @@ export default function HomePage() {
                     Welcome to crat.co
                 </h1>
 
-                <div className="py-8 px-4 shadow sm:rounded-lg sm:px-10">
+                <div className="py-8 px-4 sm:rounded-lg sm:px-10">
                     <button
                         className="btn btn-active btn-primary flex mx-auto"
                         onClick={openModal}

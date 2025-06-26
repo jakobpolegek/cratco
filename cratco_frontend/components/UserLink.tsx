@@ -77,7 +77,6 @@ export function UserLink({ link }: { link: ILink }) {
                 onClose={closeModal}
                 linkId={link._id}
                 linkName={link.name}
-                shouldRedirect={true}
             />
             <CreateEditLinkModal
                 ref={editModalRef}

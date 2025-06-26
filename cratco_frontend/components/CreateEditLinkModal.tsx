@@ -63,30 +63,36 @@ const CreateEditLinkModal = forwardRef<HTMLDialogElement, ICreateEditLinkModalPr
         setIsSubmitting(true);
         setAlert(null);
 
-        const result = await createOrUpdateLink({
-            ...formData,
-            _id: mode === 'edit' ? editLink?._id : undefined,
-            mode: mode,
-        });
+        try{
+            const result = await createOrUpdateLink({
+                ...formData,
+                _id: mode === 'edit' ? editLink?._id : undefined,
+                mode: mode,
+            });
 
-        if (result.success) {
-            const successMessage = mode === 'edit' ? 'Link successfully updated!' : 'Link successfully created!';
-            setAlert({ type: 'success', message: `${successMessage} This window will automatically close.` });
-            setTimeout(() => {
-                setIsSubmitting(false);
-                setAlert(null);
-                clearForm();
-                onClose();
-            }, 3000);
-        } else {
-            setAlert({ type: 'error', message: result.error || 'An unknown error occurred.' });
-            setTimeout(() => {
-                setIsSubmitting(false);
-                setAlert(null);
-                clearForm();
-                onClose();
-            }, 5000);
+            if (result.success) {
+                const successMessage = mode === 'edit' ? 'Link successfully updated!' : 'Link successfully created!';
+                setAlert({ type: 'success', message: `${successMessage} This window will automatically close.` });
+                setTimeout(() => {
+                    setIsSubmitting(false);
+                    setAlert(null);
+                    clearForm();
+                    onClose();
+                }, 3000);
+            } else {
+                setAlert({ type: 'error', message: result.error || 'An unknown error occurred.' });
+                setTimeout(() => {
+                    setIsSubmitting(false);
+                    setAlert(null);
+                    clearForm();
+                    onClose();
+                }, 5000);
+            }
+        } catch (error) {
+            setIsSubmitting(false);
+            setAlert({ type: 'error', message: error instanceof Error && error.message || 'An unknown error occurred.' });
         }
+
     };
 
     const modalTitle = mode === 'edit' ? 'Edit Link' : 'Create New Link';

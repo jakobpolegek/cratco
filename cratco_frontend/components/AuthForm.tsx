@@ -47,8 +47,7 @@ export function AuthForm({ mode }: IAuthFormProps) {
                 }
             }
         } catch (err) {
-            console.error('Unexpected error during authentication:', err);
-            setError('An unexpected error occurred');
+            setError(`Unexpected error during authentication: : ${err instanceof Error ? err.message : 'An unknown error occurred'}`);
         } finally {
             setLoading(false);
         }
@@ -65,11 +64,14 @@ export function AuthForm({ mode }: IAuthFormProps) {
                 prompt: 'select_account'
             });
         } catch (err) {
-            console.error('Google sign in error:', err);
-            setError('Google sign in failed');
+            setError(`Google sign in error: ${err instanceof Error ? err.message : 'An unknown error occurred'}`);
             setLoading(false);
         }
     };
+
+    if (error) {
+        throw error;
+    }
 
     return (
         <div className="max-w-md mx-auto mt-8 p-6 bg-darken rounded-lg shadow-md">

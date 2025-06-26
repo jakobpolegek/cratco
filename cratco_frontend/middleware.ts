@@ -49,7 +49,7 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL(token ? '/' : '/login', request.url));
 
         } catch (error) {
-            console.error('Network error in public link middleware:', error);
+            console.error('Network error in public link middleware: ', error);
             return NextResponse.redirect(new URL('/login', request.url));
         }
     }

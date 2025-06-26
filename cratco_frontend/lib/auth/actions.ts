@@ -20,13 +20,13 @@ export async function signUp(
         const data:  IAuthResponse = await response.json();
 
         if (!response.ok) {
-            return { error: data.message || 'Sign up failed.' };
+            throw new Error(`An error occured trying to fetch links: ${data.message || 'Invalid response from server.'}`);
         }
 
         return { success: true };
 
-    } catch  {
-        return { error: 'An unexpected network error occurred.' };
+    } catch(error)  {
+        throw new Error(`Sign up failed: ${error instanceof Error || 'An unexpected network error occurred.' }`);
     }
 
 }

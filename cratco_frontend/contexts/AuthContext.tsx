@@ -16,7 +16,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (status === 'loading') {
             setLoading(true);
         } else if (status === 'authenticated') {
-
             setUser({
                 name: session.user?.name,
                 email: session.user?.email,

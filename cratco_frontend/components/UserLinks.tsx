@@ -8,11 +8,11 @@ import {ArrowRight, Copy, Trash} from "@deemlol/next-icons";
 import DeleteLinkModal from "@/components/DeleteLinkModal";
 import {LinkVisitsChart} from "@/components/charts/LinkVisitsChart";
 import {getLinks} from "@/lib/links/actions";
-
 export function UserLinks() {
     const [links, setLinks] = useState<ILink[]>([]);
     const [loading, setLoading] = useState(true);
     const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    const [error, setError] = useState<Error | null>(null);
     const [linkToDelete, setLinkToDelete] = useState<{ id: string; name: string } | null>(null);
     const modalRef = useRef<HTMLDialogElement>(null);
     const searchParams = useSearchParams();
@@ -24,9 +24,7 @@ export function UserLinks() {
 
     const closeModal = () => {
         modalRef.current?.close();
-        setAlert(null);
         setLinkToDelete(null);
-        fetchLinks();
     };
 
     const fetchLinks = async () => {
@@ -34,7 +32,9 @@ export function UserLinks() {
             const data = await getLinks();
             setLinks(data);
         } catch (error) {
-            console.error('Failed to fetch links:', error);
+            if (error instanceof Error) {
+                setError(error);
+            }
         } finally {
             setLoading(false);
         }
@@ -42,9 +42,6 @@ export function UserLinks() {
 
     useEffect(() => {
         fetchLinks();
-    }, []);
-
-    useEffect(() => {
         const deleted = searchParams.get('deleted');
         const linkName = searchParams.get('name');
 
@@ -53,7 +50,7 @@ export function UserLinks() {
                 type: 'success',
                 message: `"${linkName}" has been successfully deleted!`
             });
-
+            fetchLinks();
             const newUrl = window.location.pathname;
             window.history.replaceState({}, '', newUrl);
 
@@ -62,6 +59,10 @@ export function UserLinks() {
             }, 4000);
         }
     }, [searchParams]);
+
+    if (error) {
+        throw error;
+    }
 
     return (
         <div className="flex justify-center my-8">

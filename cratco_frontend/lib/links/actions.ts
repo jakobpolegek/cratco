@@ -25,16 +25,14 @@ export async function getLinks(): Promise<ILink[]> {
         });
 
         if (!res.ok) {
-            console.error('Failed to fetch links. Status:', res.status);
-            return [];
+            throw new Error('Failed to fetch links. Status: '+ res.status);
         }
 
         const { data } = await res.json();
         return data || [];
 
     } catch (error) {
-        console.error('An error occurred while fetching links:', error);
-        return [];
+        throw new Error(`An error occured trying to fetch links: ${error}`);
     }
 }
 
@@ -79,17 +77,17 @@ export async function createOrUpdateLink(
     const session = await getServerSession(authOptions);
 
     if (!session?.customToken) {
-        return { success: false, error: 'Unauthorized.' };
+        throw new Error(`Unauthorized.`);
     }
 
     const token = session.customToken;
 
     if (!token) {
-        return { success: false, error: 'Unauthorized.' };
+        throw new Error(`Token is missing.`);
     }
 
     if (!formData.originalAddress.trim()) {
-        return { success: false, error: 'Original link is required!' };
+        throw new Error(`Original link is required.`);
     }
 
     try {
@@ -121,7 +119,7 @@ export async function createOrUpdateLink(
         });
         if (!response.ok) {
             const errorData = await response.json();
-            return { success: false, error: errorData.message || 'API request failed.' };
+            throw new Error(`${errorData.message}`);
         }
 
         revalidatePath('/my-links');
@@ -132,8 +130,7 @@ export async function createOrUpdateLink(
         return { success: true };
 
     } catch (error) {
-        console.error("Link action failed:", error);
-        return { success: false, error: 'An unexpected error occurred.' };
+        throw new Error(`An error occured trying to create or update link: ${error}`);
     }
 }
 
@@ -144,7 +141,7 @@ export async function deleteLink(
     const session = await getServerSession(authOptions);
 
     if (!session?.customToken) {
-        return { success: false, error: 'Unauthorized.' };
+        throw new Error(`Unauthorized.`);
     }
 
     const token = session.customToken;
@@ -157,10 +154,10 @@ export async function deleteLink(
 
         if (!response.ok) {
             const errorData = await response.json();
-            return { success: false, error: errorData.message || 'Failed to delete link.' };
+            throw new Error(`Failed to delete link: ${errorData.message}`);
         }
-    } catch {
-        return { success: false, error: 'An unexpected error occurred.' };
+    } catch (error) {
+        throw new Error(`An error occured trying to delete link: ${error}`);
     }
     revalidatePath('/my-links');
 

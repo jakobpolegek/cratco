@@ -6,7 +6,7 @@ import { deleteLink } from '@/lib/links/actions';
 import { useRouter } from "next/navigation";
 
 const DeleteLinkModal = forwardRef<HTMLDialogElement, IDeleteLinkModalProps>(
-    ({ onClose, linkId, linkName, shouldRedirect = false }, ref) => {
+    ({ onClose, linkId, linkName }, ref) => {
         const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
         const [isPending, startTransition] = useTransition();
         const router = useRouter();
@@ -18,23 +18,21 @@ const DeleteLinkModal = forwardRef<HTMLDialogElement, IDeleteLinkModalProps>(
 
         const handleConfirmDelete = () => {
             startTransition(async () => {
-                setAlert(null);
+                try{
+                    setAlert(null);
 
-                const result = await deleteLink(linkId);
+                    const result = await deleteLink(linkId);
 
-                if (result.success) {
-                    if (shouldRedirect) {
+                    if (result.success) {
                         router.replace('/my-links?deleted=true&name=' + encodeURIComponent(linkName || 'Link'));
+                        handleClose()
                     } else {
-                        const message = 'Link successfully deleted! This window will automatically close.';
-                        setAlert({ type: 'success', message });
-                        setTimeout(() => {
-                            handleClose();
-                        }, 2000);
+                        setAlert({ type: 'error', message: result.error || 'Failed to delete link.' });
                     }
-                } else {
-                    setAlert({ type: 'error', message: result.error || 'Failed to delete link.' });
+                } catch (error) {
+                    setAlert({ type: 'error', message: error instanceof Error && error.message || 'Failed to delete link.' });
                 }
+
             });
         };
 
