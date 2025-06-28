@@ -32,6 +32,9 @@ export async function middleware(request: NextRequest) {
             });
 
             if (!response.ok) {
+                if (response.status === 404) {
+                    return NextResponse.rewrite(new URL('/j', request.url));
+                }
                 console.error(`API error for public link '${alias}': Status ${response.status}`);
                 return NextResponse.redirect(new URL('/login', request.url));
             }
