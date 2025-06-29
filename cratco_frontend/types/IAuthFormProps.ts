@@ -1,3 +1,3 @@
 export interface IAuthFormProps {
-    mode: 'login' | 'register';
+  mode: 'login' | 'register';
 }

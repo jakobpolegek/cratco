@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint-and-format": "npm run lint && npm run format"
   },
   "dependencies": {
     "@deemlol/next-icons": "^0.1.9",
@@ -27,6 +30,8 @@
     "daisyui": "^5.0.43",
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
+    "eslint-config-prettier": "^10.1.5",
+    "prettier": "3.6.2",
     "tailwindcss": "^4.1.8",
     "typescript": "^5"
   }

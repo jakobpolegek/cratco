@@ -7,66 +7,77 @@ const protectedPaths = ['/my-links'];
 const allAppPaths = ['/', '/login', '/register', '/my-links', '/about'];
 
 export async function middleware(request: NextRequest) {
-    const { pathname } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
-    const token = await getToken({
-        req: request,
-        secret: process.env.NEXTAUTH_SECRET
-    });
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
-    if (token && publicOnlyPaths.some(path => pathname.startsWith(path))) {
-        return NextResponse.redirect(new URL('/', request.url));
-    }
+  if (token && publicOnlyPaths.some((path) => pathname.startsWith(path))) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
 
-    const isAppPath = allAppPaths.some(path =>
-        path === '/' ? pathname === path : pathname.startsWith(path)
+  const isAppPath =
+    allAppPaths.some((path) =>
+      path === '/' ? pathname === path : pathname.startsWith(path)
     ) || pathname.match(/^\/my-links\/[^\/]+$/);
 
-    if (!isAppPath) {
-        try {
-            const alias = pathname.slice(1);
-            const apiEndpoint = `${process.env.NEXT_PUBLIC_API_SRC}/links/public-links/${alias}`;
+  if (!isAppPath) {
+    try {
+      const alias = pathname.slice(1);
+      const apiEndpoint = `${process.env.NEXT_PUBLIC_API_SRC}/links/public-links/${alias}`;
 
-            const response = await fetch(apiEndpoint, {
-                headers: { 'Authorization': `Bearer ${process.env.PUBLIC_LINKS_SECRET}` }
-            });
+      const response = await fetch(apiEndpoint, {
+        headers: { Authorization: `Bearer ${process.env.PUBLIC_LINKS_SECRET}` },
+      });
 
-            if (!response.ok) {
-                if (response.status === 404) {
-                    return NextResponse.rewrite(new URL('/j', request.url));
-                }
-                console.error(`API error for public link '${alias}': Status ${response.status}`);
-                return NextResponse.redirect(new URL('/login', request.url));
-            }
-
-            const { data } = await response.json();
-            if (data.originalAddress) {
-                fetch(apiEndpoint, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.PUBLIC_LINKS_SECRET}` }
-                }).catch(error => console.error('Error updating visit count:', error));
-
-                return NextResponse.redirect(data.originalAddress);
-            }
-
-            return NextResponse.redirect(new URL(token ? '/' : '/login', request.url));
-
-        } catch (error) {
-            console.error('Network error in public link middleware: ', error);
-            return NextResponse.redirect(new URL('/login', request.url));
+      if (!response.ok) {
+        if (response.status === 404) {
+          return NextResponse.rewrite(new URL('/j', request.url));
         }
-    }
-
-    const isProtectedRoute = protectedPaths.some(path => pathname.startsWith(path)) || pathname === '/';
-    if (!token && isProtectedRoute) {
+        console.error(
+          `API error for public link '${alias}': Status ${response.status}`
+        );
         return NextResponse.redirect(new URL('/login', request.url));
-    }
+      }
 
-    return NextResponse.next();
+      const { data } = await response.json();
+      if (data.originalAddress) {
+        fetch(apiEndpoint, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.PUBLIC_LINKS_SECRET}`,
+          },
+        }).catch((error) =>
+          console.error('Error updating visit count:', error)
+        );
+
+        return NextResponse.redirect(data.originalAddress);
+      }
+
+      return NextResponse.redirect(
+        new URL(token ? '/' : '/login', request.url)
+      );
+    } catch (error) {
+      console.error('Network error in public link middleware: ', error);
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+
+  const isProtectedRoute =
+    protectedPaths.some((path) => pathname.startsWith(path)) ||
+    pathname === '/';
+  if (!token && isProtectedRoute) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-    matcher: [
-        '/((?!api/auth|_next/static|_next/image|favicon\\.ico|\\.well-known).*)',
-    ],
+  matcher: [
+    '/((?!api/auth|_next/static|_next/image|favicon\\.ico|\\.well-known).*)',
+  ],
 };

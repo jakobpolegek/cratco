@@ -1,5 +1,5 @@
 export interface IDeleteLinkModalProps {
-    onClose: () => void;
-    linkId: string;
-    linkName?: string;
+  onClose: () => void;
+  linkId: string;
+  linkName?: string;
 }
