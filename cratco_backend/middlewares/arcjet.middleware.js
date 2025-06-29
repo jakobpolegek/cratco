@@ -6,20 +6,20 @@ const arcjetMiddleware = async (req, res, next) => {
 
         if (decision.isDenied()) {
             if (decision.reason.isRateLimit()) {
-                return res.status(429).json({error: 'Too many requests.'})
+                return res.status(429).json({error: 'Too many requests.'});
             }
             if (decision.reason.isBot) {
-                return res.status(403).json({error: 'Bot detected.'})
+                return res.status(403).json({error: 'Bot detected.'});
             }
 
-            return res.status(403).json({error: 'Access denied.'})
+            return res.status(403).json({error: 'Access denied.'});
         }
 
-        next()
+        next();
     } catch (error) {
-        console.log(`Arcjet Middleware Error: ${error.message}`)
+        console.log(`Arcjet Middleware Error: ${error.message}`);
         next(error);
     }
-}
+};
 
 export default arcjetMiddleware;

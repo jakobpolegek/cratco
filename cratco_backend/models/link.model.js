@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
-const linkSchema = new mongoose.Schema({
+const linkSchema = new mongoose.Schema(
+    {
     name: {
         type: String,
         required: [true, 'Link name is required!'],
@@ -19,19 +20,22 @@ const linkSchema = new mongoose.Schema({
     customAddress: {
         type: String,
         required: [true, 'Custom address is required!'],
-        unique: [true, 'Custom address is already taken! Try another one or leave it blank to get a random one.'],
+        unique: [
+            true,
+            'Custom address is already taken! Try another one or leave it blank to get a random one.',
+        ],
         trim: true,
         minLength: 3,
         maxLength: 7,
     },
-    visits:{
-        type: Number,
-        default: 0,
+        visits: {
+            type: Number,
+            default: 0,
     },
     status: {
         type: String,
         enum: ['active', 'inactive'],
-        default: 'active'
+        default: 'active',
     },
     startDate: {
         type: Date,
@@ -40,8 +44,8 @@ const linkSchema = new mongoose.Schema({
             validator: function (v) {
                 return v <= new Date();
             },
-            message: 'Start date must be in the past!'
-        }
+            message: 'Start date must be in the past!',
+        },
     },
     renewalDate: {
         type: Date,
@@ -56,16 +60,18 @@ const linkSchema = new mongoose.Schema({
             validator: function (v) {
                 return v > this.startDate;
             },
-            message: 'Renewal date must be after start date!'
-        }
+            message: 'Renewal date must be after start date!',
+        },
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
         index: true,
-    }
-}, {timestamps: true});
+    },
+    },
+    {timestamps: true}
+);
 
 linkSchema.pre('save', function (next) {
     if (this.renewalDate < new Date()) {

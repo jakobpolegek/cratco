@@ -17,14 +17,16 @@ const errorMiddleware = (err, req, res, next) => {
         }
 
         if (err && err.name === 'ValidationError') {
-            const message = Object.values(err.errors).map(val => val.message).join(', ');
+            const message = Object.values(err.errors)
+                .map((val) => val.message)
+                .join(', ');
             error = new Error(message);
             error.status = 400;
         }
 
         res.status(error.status || 500).json({
             success: false,
-            message: error.message || 'Internal server error'
+            message: error.message || 'Internal server error',
         });
     } catch (error) {
         next(error);

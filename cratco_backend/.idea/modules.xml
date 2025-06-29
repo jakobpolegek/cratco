@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/cratco_backend.iml" filepath="$PROJECT_DIR$/.idea/cratco_backend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../cratco_frontend/.idea/cratco_frontend.iml" filepath="$PROJECT_DIR$/../cratco_frontend/.idea/cratco_frontend.iml" />
     </modules>
   </component>
 </project>

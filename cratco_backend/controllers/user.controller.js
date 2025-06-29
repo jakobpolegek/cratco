@@ -8,7 +8,7 @@ export const getUsers = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-}
+};
 
 export const getUser = async (req, res, next) => {
     try {
@@ -22,4 +22,4 @@ export const getUser = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-}
+};

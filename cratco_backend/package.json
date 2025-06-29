@@ -7,7 +7,12 @@
     "start": "NODE_ENV=development node server.js",
     "start:prod": "NODE_ENV=production nodenode server.js",
     "dev": "NODE_ENV=development nodemon server.js",
-    "build": "echo 'This is an Express app. No need to build anything.'"
+    "build": "echo 'This is an Express app. No need to build anything.'",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint-and-format": "npm run lint && npm run format"
   },
   "dependencies": {
     "@arcjet/inspect": "^1.0.0-beta.8",
@@ -26,9 +31,12 @@
     "vercel": "^43.2.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.27.0",
-    "eslint": "^9.27.0",
+    "eslint": "^9.30.0",
+    "eslint-config-prettier": "^10.1.5",
     "globals": "^16.2.0",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2"
   }
 }
