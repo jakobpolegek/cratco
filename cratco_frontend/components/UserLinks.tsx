@@ -8,6 +8,7 @@ import { ArrowRight, Copy, Trash } from '@deemlol/next-icons';
 import DeleteLinkModal from '@/components/DeleteLinkModal';
 import { LinkVisitsChart } from '@/components/charts/LinkVisitsChart';
 import { getLinks } from '@/lib/links/actions';
+
 export function UserLinks() {
   const [links, setLinks] = useState<ILink[]>([]);
   const [loading, setLoading] = useState(true);

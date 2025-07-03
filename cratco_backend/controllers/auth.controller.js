@@ -2,15 +2,15 @@ import mongoose from 'mongoose';
 import User from '../models/user.model.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import {JWT_EXPIRES_IN, JWT_SECRET} from '../config/env.js';
+import { JWT_EXPIRES_IN, JWT_SECRET } from '../config/env.js';
 
 export const signUp = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    const {name, email, password} = req.body;
-    const existingUser = await User.findOne({email});
+    const { name, email, password } = req.body;
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       const error = new Error('User already exists');
       error.status = 409;
@@ -20,10 +20,10 @@ export const signUp = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUsers = await User.create(
-        [{name, email, password: hashedPassword}],
-        {session}
+      [{ name, email, password: hashedPassword }],
+      { session }
     );
-    const token = jwt.sign({userId: newUsers[0]._id}, JWT_SECRET, {
+    const token = jwt.sign({ userId: newUsers[0]._id }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
 
@@ -33,7 +33,7 @@ export const signUp = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: 'User created successfully!',
-      data: {token, user: newUsers[0]},
+      data: { token, user: newUsers[0] },
     });
   } catch (error) {
     await session.abortTransaction();
@@ -44,8 +44,8 @@ export const signUp = async (req, res, next) => {
 
 export const signIn = async (req, res, next) => {
   try {
-    const {email, password} = req.body;
-    const user = await User.findOne({email});
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
     if (!user) {
       const error = new Error('Invalid credentials.');
       error.status = 401;
@@ -58,7 +58,7 @@ export const signIn = async (req, res, next) => {
       throw error;
     }
 
-    const token = jwt.sign({userId: user._id}, JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
     res.status(200).json({
@@ -80,7 +80,7 @@ export const signIn = async (req, res, next) => {
 
 export const socialLogin = async (req, res, next) => {
   try {
-    const {email, name, provider} = req.body;
+    const { email, name, provider } = req.body;
 
     if (!email) {
       return res.status(400).json({
@@ -89,7 +89,7 @@ export const socialLogin = async (req, res, next) => {
       });
     }
 
-    let user = await User.findOne({email});
+    let user = await User.findOne({ email });
 
     if (user) {
       if (user.authMethod !== provider) {
@@ -106,12 +106,12 @@ export const socialLogin = async (req, res, next) => {
       });
     }
 
-    const token = jwt.sign({userId: user._id}, JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
-    const userDTO = {_id: user._id, name: user.name, email: user.email};
+    const userDTO = { _id: user._id, name: user.name, email: user.email };
 
-    res.status(200).json({success: true, data: {token, user: userDTO}});
+    res.status(200).json({ success: true, data: { token, user: userDTO } });
   } catch (error) {
     next(error);
   }
@@ -120,8 +120,8 @@ export const socialLogin = async (req, res, next) => {
 export const signOut = async (req, res, next) => {
   try {
     res
-        .status(200)
-        .json({success: true, message: 'User logged out successfully!'});
+      .status(200)
+      .json({ success: true, message: 'User logged out successfully!' });
   } catch (error) {
     next(error);
   }

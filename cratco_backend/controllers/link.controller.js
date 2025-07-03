@@ -1,5 +1,5 @@
 import Link from '../models/link.model.js';
-import {generateUniqueField} from '../utils/generateUniqueField.js';
+import { generateUniqueField } from '../utils/generateUniqueField.js';
 
 export const createLink = async (req, res, next) => {
   try {
@@ -20,7 +20,7 @@ export const createLink = async (req, res, next) => {
       });
     }
 
-    const linkData = {...req.body, user: req.user._id};
+    const linkData = { ...req.body, user: req.user._id };
     linkData.originalAddress = validatedUrl.href;
 
     const uniqueAddress = await generateUniqueField('customAddress', 7);
@@ -33,7 +33,7 @@ export const createLink = async (req, res, next) => {
 
     const link = await Link.create(linkData);
 
-    res.status(201).json({success: true, data: link});
+    res.status(201).json({ success: true, data: link });
   } catch (error) {
     next(error);
   }
@@ -42,11 +42,11 @@ export const createLink = async (req, res, next) => {
 export const updateLink = async (req, res, next) => {
   try {
     const link = await Link.findOneAndUpdate(
-        {_id: req.params.id, user: req.user._id},
-        req.body,
-        {new: true}
+      { _id: req.params.id, user: req.user._id },
+      req.body,
+      { new: true }
     );
-    res.status(200).json({success: true, data: link});
+    res.status(200).json({ success: true, data: link });
   } catch (error) {
     next(error);
   }
@@ -54,20 +54,20 @@ export const updateLink = async (req, res, next) => {
 
 export const updateVisitsCount = async (req, res, next) => {
   try {
-    const {customAddress} = req.params;
+    const { customAddress } = req.params;
     const updatedLink = await Link.findOneAndUpdate(
-        {customAddress: customAddress},
-        {$inc: {visits: 1}},
-        {new: true}
+      { customAddress: customAddress },
+      { $inc: { visits: 1 } },
+      { new: true }
     );
 
     if (!updatedLink) {
       return res
-          .status(404)
-          .json({success: false, message: 'Link not found.'});
+        .status(404)
+        .json({ success: false, message: 'Link not found.' });
     }
 
-    res.status(200).json({success: true, data: updatedLink});
+    res.status(200).json({ success: true, data: updatedLink });
   } catch (error) {
     next(error);
   }
@@ -79,7 +79,7 @@ export const deleteLink = async (req, res, next) => {
       _id: req.params.id,
       user: req.user._id,
     });
-    res.status(200).json({success: true, data: link});
+    res.status(200).json({ success: true, data: link });
   } catch (error) {
     next(error);
   }
@@ -87,15 +87,16 @@ export const deleteLink = async (req, res, next) => {
 
 export const getUserLinks = async (req, res, next) => {
   try {
-    const links = await Link.find({user: req.user._id});
-
+    const links = await Link.find({ user: req.user._id }).sort({
+      updatedAt: -1,
+    });
     if (!links) {
       const error = new Error('No links found for this user.');
       error.status = 404;
       throw error;
     }
 
-    res.status(200).json({success: true, data: links});
+    res.status(200).json({ success: true, data: links });
   } catch (error) {
     next(error);
   }
@@ -103,7 +104,7 @@ export const getUserLinks = async (req, res, next) => {
 
 export const getUserLink = async (req, res, next) => {
   try {
-    const link = await Link.findOne({_id: req.params.id, user: req.user._id});
+    const link = await Link.findOne({ _id: req.params.id, user: req.user._id });
 
     if (!link) {
       const error = new Error('Link not found.');
@@ -111,7 +112,7 @@ export const getUserLink = async (req, res, next) => {
       throw error;
     }
 
-    res.status(200).json({success: true, data: link});
+    res.status(200).json({ success: true, data: link });
   } catch (error) {
     next(error);
   }

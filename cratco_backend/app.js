@@ -1,5 +1,5 @@
 import express from 'express';
-import {FRONTEND_URL} from './config/env.js';
+import { FRONTEND_URL } from './config/env.js';
 import userRouter from './routes/user.routes.js';
 import authRouter from './routes/auth.routes.js';
 import linksRouter from './routes/link.routes.js';
@@ -11,14 +11,14 @@ import cors from 'cors';
 
 const app = express();
 app.use(
-    cors({
+  cors({
     origin: FRONTEND_URL,
     credentials: true,
-    })
+  })
 );
 
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(arcjetMiddleware);
 
@@ -31,7 +31,7 @@ app.use('/api/v1/auth', authRouter);
 app.use(errorMiddleware);
 
 app.get('/', (req, res) => {
-    res.send('Welcome to cratco api!');
+  res.send('Welcome to cratco api!');
 });
 
 export default app;
