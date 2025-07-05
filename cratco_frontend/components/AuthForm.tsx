@@ -84,9 +84,10 @@ export function AuthForm({ mode }: IAuthFormProps) {
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-darken rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-center">
-        {mode === 'login' ? 'Sign In' : 'Sign Up'}
+        Welcome to cratco!
+        <br />
+        An url shortener app.
       </h2>
-
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {mode === 'register' && (
           <div>
