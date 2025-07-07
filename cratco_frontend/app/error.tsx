@@ -1,10 +1,40 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { signOut } from 'next-auth/react';
 import { AlertTriangle, House, RefreshCw } from '@deemlol/next-icons';
 import { IErrorBoundaryProps } from '@/types/IErrorBoundaryProps';
 
 export default function ErrorBoundary({ error, reset }: IErrorBoundaryProps) {
+  const [authMessage, setAuthMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (error?.message?.includes('401')) {
+      setAuthMessage('Session inactive or expired, you will be signed off...');
+
+      const timer = setTimeout(() => {
+        signOut();
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+  if (authMessage) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-base-200">
+        <div className="card bg-base-100 shadow-xl text-center">
+          <div className="card-body items-center">
+            <AlertTriangle size={48} className="text-warning mb-4" />
+            <h2 className="card-title">Authentication Issue</h2>
+            <p>{authMessage}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen from-error/10 via-base-100 to-warning/10 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">
@@ -14,7 +44,6 @@ export default function ErrorBoundary({ error, reset }: IErrorBoundaryProps) {
             <h1 className="card-title text-4xl font-bold text-error justify-center mb-4">
               Oops! Something went wrong
             </h1>
-
             <div className="collapse collapse-arrow bg-base-200 mb-6">
               <input type="checkbox" />
               <div className="collapse-title text-sm font-medium text-base-content/60">
@@ -26,7 +55,6 @@ export default function ErrorBoundary({ error, reset }: IErrorBoundaryProps) {
                 </code>
               </div>
             </div>
-
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={reset}
@@ -40,17 +68,6 @@ export default function ErrorBoundary({ error, reset }: IErrorBoundaryProps) {
                 Go Home
               </Link>
             </div>
-
-            <div className="divider my-6" />
-
-            <p className="text-base-content/50 text-sm mb-4">
-              If this problem persists, please feel free to contact support.
-            </p>
-            {error.digest && (
-              <span className="text-xs text-base-content/40">
-                Error Digest: {error.digest}
-              </span>
-            )}
           </div>
         </div>
       </div>
