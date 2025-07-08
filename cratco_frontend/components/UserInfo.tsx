@@ -13,7 +13,11 @@ export default function UserInfo() {
   return (
     <div className="mx-auto flex flex-col text-center items-center bg-base-100 rounded-box shadow-md lg:fixed lg:top-30 lg:left-10 w-4/5 lg:w-auto ">
       <p className="mt-4 text-xl uppercase font-semibold text-white opacity-80 tracking-wid px-4">
-        Hello there!
+        <img
+          src="https://media1.tenor.com/m/Tsob5aHiS3UAAAAC/hello-there.gif"
+          alt="hello"
+          className="w-48 h-48"
+        />
       </p>
       <button
         onClick={handleLogout}

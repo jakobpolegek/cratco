@@ -1,25 +1,52 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { signOut } from 'next-auth/react';
 import { AlertTriangle, House, RefreshCw } from '@deemlol/next-icons';
 import { IErrorBoundaryProps } from '@/types/IErrorBoundaryProps';
 
 export default function ErrorBoundary({ error, reset }: IErrorBoundaryProps) {
   const [authMessage, setAuthMessage] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState<number>(0);
+
+  const isAuthError = useMemo(() => {
+    if (!error) return false;
+    if (error.message?.includes('401')) return true;
+    if (error instanceof Response && error.status === 401) return true;
+
+    const authErrorPatterns = [
+      'unauthorized',
+      'authentication',
+      'session expired',
+      'invalid token',
+      'access denied',
+    ];
+
+    return authErrorPatterns.some((pattern) =>
+      error.message?.toLowerCase().includes(pattern)
+    );
+  }, [error]);
 
   useEffect(() => {
-    if (error?.message?.includes('401')) {
+    if (isAuthError) {
       setAuthMessage('Session inactive or expired, you will be signed off...');
+      setCountdown(6);
 
-      const timer = setTimeout(() => {
-        signOut();
-      }, 5000);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            signOut({ callbackUrl: '/login' });
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
 
-      return () => clearTimeout(timer);
+      return () => clearInterval(countdownInterval);
     }
-  }, [error]);
+  }, [isAuthError]);
 
   if (authMessage) {
     return (
@@ -29,6 +56,19 @@ export default function ErrorBoundary({ error, reset }: IErrorBoundaryProps) {
             <AlertTriangle size={48} className="text-warning mb-4" />
             <h2 className="card-title">Authentication Issue</h2>
             <p>{authMessage}</p>
+            {countdown > 0 && (
+              <p className="text-sm text-base-content/60 mt-2">
+                Redirecting in {countdown} seconds...
+              </p>
+            )}
+            <div className="card-actions justify-center mt-4">
+              <button
+                onClick={() => signOut({ callbackUrl: '/login' })}
+                className="btn btn-primary btn-sm"
+              >
+                Sign Out Now
+              </button>
+            </div>
           </div>
         </div>
       </div>
